@@ -115,12 +115,10 @@ function Kotranscode2() {
       }
     })
     .then((res) => {
-      console.log("1" + res.data);
-      console.log("2" + res.data == null);
-      console.log("3" + res.data == '');
+      if(res.data == ''){
+        throw new Error("쿼리문 작성 오류");
+      }
       let testShow = [];
-      console.log(res.data);
-      console.log(res.data[0]);
       let originLen = Array.from(res.data).length;
       if(res.data[0] === '^err$'){
         throw new Error("err Error");
@@ -136,9 +134,10 @@ function Kotranscode2() {
           testShow.push(res.data[i]);
         }
       }
-      let alertStr = "====테스트 결과====\n조회할 컬럼은 하나여야 합니다.\n둘이상일 경우 첫번쨰 컬럼만 보여집니다.\n";
+      let alertStr = "====테스트 결과====\n조회 컬럼은 2개만 가능합니다.\nkey에는 한글 value에는 코드가 와야합니다.\n================\n";
+      alertStr += "key          value\n";
       for(let i = 0; i < testShow.length; i++){
-        alertStr += testShow[i] + "\n";
+        alertStr += testShow[i].transKey + "          " + testShow[i].transValue + "\n";
       }
       if(testShow.length >= 4){
         alertStr += "...\n";
@@ -213,66 +212,6 @@ function Kotranscode2() {
         
       </div>
       
-      {/* <div id = 'checkboxDiv'style={{height: "20%", backgroundColor:"gray"}}>
-        검색 확장자 : <br/>
-        <label for='jsp'>.jsp</label>
-        <input id = 'jsp' type="checkbox" name='jsp' value='.jsp'/>
-        <label for='js'>.js</label>
-        <input id = 'js' type="checkbox" name='js' value='.js'/>
-        <label for='html'>.html</label>
-        <input id = 'html' type="checkbox" name='html' value='.html'/>
-        <label for='java'>.java</label>
-        <input id = 'java' type="checkbox" name='java' value='.java'/>
-      </div>  */}
-
-
-      {/* <div id = 'excludeDiv'style={{height: "20%", backgroundColor:"gray"}}>
-        제외하고자 하는 파일명 : <input id='excludefile'type="text" name = "excludefile"/><br/>
-        ex) test.java, test.jsp, test.js <br/>
-      </div>  */}
-        
-      {/* <div id = 'startQuery'>
-        검색 쿼리 입력 : <input id='searchQuery'type="text" name = "searchQuery"/>
-        <button onClick={queryTest}>Test</button>
-      </div> */}
-
-      {/* <div style={{height: "10%", marginTop:"20px"}}>
-        <input
-          id="filechang"
-          type="file"
-          ref={fileInput}
-          onChange={handleChange}
-          // style={{ display: "none" }}
-          readOnly
-          style={{
-            color:"white",
-            fontSize: "15px",
-            textAlign: "center",
-          }}
-        />
-        <button id="sendfile" style={{fontSize: "15px"}} onClick={handleFileUpload}>파일 전송</button>
-        <p style={{color:"white", fontSize:"15px"}}>자동으로 다운로드 됩니다.</p>
-        <p id="changing" style={{fontSize:"15px"}}>파일 변환 중--<span id="loading-spinner"></span></p>
-
-      </div> */}
-      <div style={{backgroundColor: "gray", height:"10%", textAlign:"left"}}>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [사용 설명]<br/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 스프링 프로젝트의 src 폴더를 zip형식으로 압축한다.<br/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 변환이 필요한 확장자를 선택한다.<br/><br/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;압축 파일의 디렉토리 구조&gt;<br/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |--- src<br/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |--- main<br/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br/>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |--- test<br/>
-        <br/><br/>
-        추가 기능<br/>
-        2. 제외 파일 적용하기<br/><br/>
-        추후<br/>
-        1. 디자인
-
-
-      </div>
       <div style={{backgroundColor: "red", height:"10%"}}></div>
        <div id="directoryTitle"style={{color:"white", fontSize:"20px", display:"none"}}>Directory Structure</div>
        <div id="directoryarea" style={{textAlign:"left" ,background:"black",color:"white",display:"none", height: "300px", overflowY: "scroll"}}>

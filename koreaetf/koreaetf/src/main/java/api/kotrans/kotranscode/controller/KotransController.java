@@ -57,6 +57,7 @@ public class KotransController {
 												@RequestParam("password") String password,
 												@RequestParam("url") String url
 												) {
+		System.out.println("url = " + url);
 		DbInfo dbInfo = new DbInfo(url, username, password, driver, searchList.split(","), searchQuery);
 		dbInfo.dbCheck();
 		
@@ -94,6 +95,7 @@ public class KotransController {
 									 @RequestParam("url") String url){
 		try{
 			DbInfo dbInfo = new DbInfo(url, username, password, driver, searchQuery);
+			dbInfo.dbCheck();
 			return dynamicDatabaseService.connectToDatabase(dbInfo);
 		}catch(Exception e){
 			return null;

@@ -12,6 +12,7 @@ import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import api.kotrans.kotranscode.config.ChangeQueryConfig;
 import api.kotrans.kotranscode.dao.KoTransCodeDao;
 import api.kotrans.kotranscode.domain.DbInfo;
 import api.kotrans.kotranscode.domain.ResultDao;
@@ -48,12 +49,16 @@ public class DynamicDatabaseService {
 			// ===================================================
 			KoTransCodeDao mapper = sqlSession.getMapper(KoTransCodeDao.class);
 			Long start = System.currentTimeMillis();
-			List<ResultDao> result = mapper.connTest(dbInfo.getSearchQuery());
+			List<ResultDao> result = mapper.connTest(ChangeQueryConfig.changeQuery(dbInfo.getSearchQuery()));
+			for(ResultDao rd : result) {
+				System.out.println("key = " + rd.getTransKey() + ", value = " + rd.getTransValue());
+			}
 			Long end = System.currentTimeMillis();
 			System.out.println("쿼리 실행 시간 : " + ((end - start) / 1000) + "초 소요");
 			return result;
 			// ===================================================
 		} catch (Exception e) {
+			System.out.println("query = " + ChangeQueryConfig.changeQuery(dbInfo.getSearchQuery()));
 			e.printStackTrace();
 			throw e;
 		} finally {

@@ -21,7 +21,6 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,6 +32,7 @@ import java.util.zip.ZipOutputStream;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import api.kotrans.kotranscode.config.ChangeQueryConfig;
 import api.kotrans.kotranscode.dao.KoTransCodeDao;
 import api.kotrans.kotranscode.domain.DbInfo;
 import api.kotrans.kotranscode.domain.ResultDao;
@@ -118,7 +118,7 @@ public class KoTransCodeImpl implements KoTransCode {
 		// 아래에선 Map을 get해서 value값으로 대체한다.
 		// ===========================================================
 		
-		dbInfo.setSearchQuery(changeQuery(dbInfo.getSearchQuery()));
+		dbInfo.setSearchQuery(ChangeQueryConfig.changeQuery(dbInfo.getSearchQuery()));
 		List<ResultDao> resultMap = null;
 		try{
 			resultMap = dynamicDatabaseService.connectToDatabase(dbInfo);
@@ -135,11 +135,12 @@ public class KoTransCodeImpl implements KoTransCode {
 		try {
 			// 루트 경로를 보여준다.
 			String currentWorkingDirectory = System.getProperty("user.dir");
+			System.out.println("currentWorkingDirectory = " + currentWorkingDirectory);
 
 			Path projectRoot = Paths.get(currentWorkingDirectory); // 절대 경로로 표시
-			// System.out.println("projectRoot : " + projectRoot.toString());
+			 System.out.println("projectRoot : " + projectRoot.toString());
 			Path tempDirectory = Files.createDirectories(projectRoot.resolve("temp-zip")); // temp-zip이라는 폴더의  경로
-			// System.out.println("temDirectory : " + tempDirectory);
+			 System.out.println("temDirectory : " + tempDirectory);
 
 			Path testDirectory = Files.createDirectories(tempDirectory.resolve(uid.toString())); // temp-zip이라는  폴더의  경로
 			// Path uploadedFilePath = tempDirectory.resolve(file.getOriginalFilename());
@@ -212,46 +213,46 @@ public class KoTransCodeImpl implements KoTransCode {
 	// dao에 연결 가능하게 쿼리 변환
 	// ex) select member_id, member_name from member
 	//     select member_id as key, member_name as value from member
-	public String changeQuery(String query){
-		query = query.toUpperCase();
-		String pattern = "SELECT(.*?)FROM";
-        Pattern regex = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-        Matcher matcher = regex.matcher(query);
-
-        
-        List<String> resultList = new ArrayList<>();
-        if (matcher.find()) {
-            String result = matcher.group(1).trim();
-            String[] resultArr = result.split(",");
-            for(String str : resultArr){
-                str = str.trim(); // 우선 공백 제거
-                if(str.split(" ").length != 1){
-                    resultList.add(str.split(" ")[0]);
-                }else{
-                    resultList.add(str);
-                }
-            }
-            if(resultList.size() > 2){
-            	return "There are many columns.";
-            }else{
-                // 사용자 쿼리를 DAO에서 가져올 수 있도록 수정
-            	try{
-            		for(int i = 0; i < 2; i++){
-            			if(i == 0){
-            				query = query.replace(resultArr[0], resultList.get(0) + " AS TRANSKEY");
-            			}else{
-            				query = query.replace(resultArr[1], resultList.get(1) + " AS TRANSVALUE");
-            			}
-            		}
-            		return query;
-            	}catch(ArrayIndexOutOfBoundsException e){
-            		return "There are few columns.";
-            	}
-            }
-        } else {
-            return "This is an invalid SQL query.";
-        }
-	}
+//	public String changeQuery(String query){
+//		query = query.toUpperCase();
+//		String pattern = "SELECT(.*?)FROM";
+//        Pattern regex = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+//        Matcher matcher = regex.matcher(query);
+//
+//        
+//        List<String> resultList = new ArrayList<>();
+//        if (matcher.find()) {
+//            String result = matcher.group(1).trim();
+//            String[] resultArr = result.split(",");
+//            for(String str : resultArr){
+//                str = str.trim(); // 우선 공백 제거
+//                if(str.split(" ").length != 1){
+//                    resultList.add(str.split(" ")[0]);
+//                }else{
+//                    resultList.add(str);
+//                }
+//            }
+//            if(resultList.size() > 2){
+//            	return "There are many columns.";
+//            }else{
+//                // 사용자 쿼리를 DAO에서 가져올 수 있도록 수정
+//            	try{
+//            		for(int i = 0; i < 2; i++){
+//            			if(i == 0){
+//            				query = query.replace(resultArr[0], resultList.get(0) + " AS TRANSKEY");
+//            			}else{
+//            				query = query.replace(resultArr[1], resultList.get(1) + " AS TRANSVALUE");
+//            			}
+//            		}
+//            		return query;
+//            	}catch(ArrayIndexOutOfBoundsException e){
+//            		return "There are few columns.";
+//            	}
+//            }
+//        } else {
+//            return "This is an invalid SQL query.";
+//        }
+//	}
 
 	// Files.delete() 메소드는 비어있는 폴더 또는 일반 파일만 가능하다.
 	private void deleteFile(Path deleteFilePath) {
