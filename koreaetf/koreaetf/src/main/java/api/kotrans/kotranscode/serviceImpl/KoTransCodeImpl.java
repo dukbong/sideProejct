@@ -135,12 +135,12 @@ public class KoTransCodeImpl implements KoTransCode {
 		try {
 			// 루트 경로를 보여준다.
 			String currentWorkingDirectory = System.getProperty("user.dir");
-			System.out.println("currentWorkingDirectory = " + currentWorkingDirectory);
+//			System.out.println("currentWorkingDirectory = " + currentWorkingDirectory);
 
 			Path projectRoot = Paths.get(currentWorkingDirectory); // 절대 경로로 표시
-			 System.out.println("projectRoot : " + projectRoot.toString());
+//			 System.out.println("projectRoot : " + projectRoot.toString());
 			Path tempDirectory = Files.createDirectories(projectRoot.resolve("temp-zip")); // temp-zip이라는 폴더의  경로
-			 System.out.println("temDirectory : " + tempDirectory);
+//			 System.out.println("temDirectory : " + tempDirectory);
 
 			Path testDirectory = Files.createDirectories(tempDirectory.resolve(uid.toString())); // temp-zip이라는  폴더의  경로
 			// Path uploadedFilePath = tempDirectory.resolve(file.getOriginalFilename());
@@ -202,7 +202,6 @@ public class KoTransCodeImpl implements KoTransCode {
 			deleteFile(tempDirectory.resolve(uid.toString()));
 			System.out.println("파일 삭제 완료 : " + ((System.currentTimeMillis() - start) / 1000) + "초 소요");
 			start = System.currentTimeMillis();
-			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

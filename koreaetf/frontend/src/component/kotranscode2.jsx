@@ -62,7 +62,7 @@ function Kotranscode2() {
           // setZipFileData(response.data.zipfile);
           setDirectory([...response.data.directory]); // 변경 감지
           document.getElementById("directoryarea").style.display = "block";
-          document.getElementById("directoryTitle").style.display="block";
+          // document.getElementById("directoryTitle").style.display="block";
           // setShowDownloadConfirmation(true);
 
           // base64
@@ -208,12 +208,17 @@ function Kotranscode2() {
             <td></td>
             <td><p style={{color:"white", fontSize:"15px", textAlign:"left"}}>자동으로 다운로드 됩니다.&nbsp;&nbsp;<span id="loading-spinner"></span></p></td>
           </tr>
+          <tr>
+            <td colSpan={2} style={{color:"white", textAlign:"left", fontWeight:"bold"}}>사용 설명서 : <a href = "https://github.com/dukbong/sideProejct">gitHub 방문</a></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+          </tr>
         </table>
         
       </div>
       
-      <div style={{backgroundColor: "red", height:"10%"}}></div>
-       <div id="directoryTitle"style={{color:"white", fontSize:"20px", display:"none"}}>Directory Structure</div>
        <div id="directoryarea" style={{textAlign:"left" ,background:"black",color:"white",display:"none", height: "300px", overflowY: "scroll"}}>
             {directory.map((item, index) => {
                const updatedItem = item.replace('^update', '').replace('^insert', ''); // ^update와 ^insert 제거
@@ -224,7 +229,7 @@ function Kotranscode2() {
                     </li>
                 );
             })}
-          </div>
+        </div>
     </div>
   );
 }

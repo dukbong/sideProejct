@@ -57,7 +57,6 @@ public class KotransController {
 												@RequestParam("password") String password,
 												@RequestParam("url") String url
 												) {
-		System.out.println("url = " + url);
 		DbInfo dbInfo = new DbInfo(url, username, password, driver, searchList.split(","), searchQuery);
 		dbInfo.dbCheck();
 		
