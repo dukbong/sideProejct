@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  backend:
+    build:
+      context: ./koreaetf #해당 폴더로 가서 DockerFile를 찾아서 실행한다.
+    ports:
+      - "8088:8088"
+    environment:
+      - BACKEND_HOST=backend #이렇게 환경변수로 받으면된다.
+      #이렇게 하지 않을경우 직접 docker inspect docker-container-name 명령어를 통해 ip 주소를 얻어야한다.
+      #도커는 각각의 분리된 공간이기 때문에 localhost를 사용할 수 없다.
+      - BACKEND_PORT=8088
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_BACKEND_HOST=backend # 이렇게 작성된건 proxy에 그래돌 적용된다. 예를 들어 proxy : http://backend/8088
+      - REACT_APP_BACKEND_PORT=8088
