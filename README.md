@@ -1,6 +1,6 @@
 **KoTransCode** is a website that helps with multilingual processing of ***jsp*** files and ***js*** files.
 
-The reason for creating this website is to solve the problem of taking a lot of time to process multiple languages.
+Reason for planning : The reason for creating this website is to solve the problem of taking a lot of time to process multiple languages.
 
 The project consists of Front : React and Back : Spring boot.
 
