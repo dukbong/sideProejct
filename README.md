@@ -38,8 +38,8 @@ Currently, up to 100MB is possible, and according to test results, it takes abou
 The session is maintained for ***30 minutes*** after the first transmission, the most recent DB_Info is saved, and Url, UserName, PassWorad, Driver, Extension, and Query are automatically created.
 
 ### Directory File Structure View
-- <span style="color:red">Red</span> indicates modified source code, where changes have been completed.
-- <span style="color:blue">Blue</span> indicates source code that requires verification, where confirmation is needed.
-- White indicates unchanged source code.
+- ***Red*** indicates modified source code, where changes have been completed.
+- ***Blue*** indicates source code that requires verification, where confirmation is needed.
+- ***White*** indicates unchanged source code.
   
 In the context of source code verification, blue signifies cases where the words are not present in the database, requiring attention.
