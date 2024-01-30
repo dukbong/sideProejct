@@ -30,6 +30,7 @@ The extension of the attached file must be ***zip*** and the attached file must 
 It should have a directory structure like the example below.
 
 ```
+--test.zip
 
 src
 │
