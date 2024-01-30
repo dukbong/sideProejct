@@ -369,7 +369,7 @@ public class KoTransCodeImpl implements KoTransCode {
 						resultBuilder.append(" "); // Add space
 					}
 
-					// 한글이 존재한다면 해당 조건에 걸린 후 변경된다.
+					// 태그 안에 있는 모든 글자를 우선적으로 가져온 후 prefix를 가지고 분류한다.
 					if (!resultBuilder.toString().equals("")) {
 						String oldChar = resultBuilder.toString().trim();
 						boolean prefixTest = oldChar.startsWith(preSuffix[0]); // 우선 현재 prefix와 같으면 제외
@@ -414,7 +414,7 @@ public class KoTransCodeImpl implements KoTransCode {
 				for (int i = 0; i < arr.length; i++) {
 
 					String row = arr[i];
-
+					// 주석 제거
 					row = row.replaceAll("/\\*(.*?)\\*/", "");
 					row = row.replaceAll("//[^\n]*", "");
 
@@ -429,7 +429,6 @@ public class KoTransCodeImpl implements KoTransCode {
 
 					// 한글이 존재한다면 해당 조건에 걸린 후 변경된다.
 					if (!resultBuilder.toString().equals("")) {
-						// =====================DB작업 : SELECT=====================
 						String oldChar = resultBuilder.toString().trim();
 						boolean boo = false;
 						for(ResultDao rd : resultMap){
@@ -445,7 +444,6 @@ public class KoTransCodeImpl implements KoTransCode {
 						if(!boo){
 							result = 2;
 						}
-						// =====================DB작업 : SELECT=====================
 						
 						row += " // " + resultBuilder.toString() + "\n";
 						row += " // " + arr[i];
