@@ -1,3 +1,7 @@
+## Issues
+1. There is a mix of Korean and English in the text, so we need to figure out how to handle this.
+
+## KoTransCode
 **KoTransCode** is a website that helps with multilingual processing of ***jsp*** files and ***js*** files.
 
 Reason for planning : The reason for creating this website is to solve the problem of taking a lot of time to process multiple languages.
@@ -8,9 +12,6 @@ The project consists of Front : React and Back : Spring boot.
 Initially, the design involved receiving source code and an Excel file, where Korean text in the source code would be replaced with the corresponding entries in the Excel file.
 However, the current approach allows individuals to use their own database.
 The entire source code is compressed, and the server retrieves language codes from the database to convert Korean text in the source code into code snippets.
-
-## Issues
-1. There is a mix of Korean and English in the text, so we need to figure out how to handle this.
 
 ### How to use the website
 1. Enter your DB Url, Username, and Password. If there is no password, leave it blank.
