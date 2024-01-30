@@ -2,6 +2,11 @@
 
 Reason for planning : The reason for creating this website is to solve the problem of taking a lot of time to process multiple languages.
 
+### Design Process
+Initially, the design involved receiving source code and an Excel file, where Korean text in the source code would be replaced with the corresponding entries in the Excel file.
+However, the current approach allows individuals to use their own database.
+The entire source code is compressed, and the server retrieves language codes from the database to convert Korean text in the source code into code snippets.
+
 The project consists of Front : React and Back : Spring boot.
 
 ## Issues
