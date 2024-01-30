@@ -13,6 +13,9 @@ Initially, the design involved receiving source code and an Excel file, where Ko
 However, the current approach allows individuals to use their own database.
 The entire source code is compressed, and the server retrieves language codes from the database to convert Korean text in the source code into code snippets.
 
+### Check before Use
+The jsp file and js file must be properly separated before use. Currently, characters in jsp tags are coded properly, but in the case of js files, only Korean characters can be coded and processed.
+
 ### How to use the website
 1. Enter your DB Url, Username, and Password. If there is no password, leave it blank.
 2. In the case of DB drivers ***Oracle, MySQL 8.x, MariaDB, and H***2 can be omitted.
