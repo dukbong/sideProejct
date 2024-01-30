@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 import "./kotranscode.css";
 import "./kotranscode2.css";
+import Ads from './ads.jsx';
 
 // 첨부파일 형식으로 디렉토리 구조를 주면 확장자를 찾아서 변경후 디렉토리 구조 그대로 반환해준다.
 function Kotranscode2() {
@@ -188,8 +189,10 @@ function Kotranscode2() {
 
 
   return (
-    <div style={{height:"100%", width:"100%", backgroundColor: "black"}}>
-      <div style={{width:"500px"}}>
+    <div>
+    <div style={{display : "flex", height:"100%"}}>
+    <div style={{height:"500px", width:"600px", backgroundColor: "#31353f"}}>
+      <div style={{width:"550px", paddingTop:"50px", paddingRight:"50px"}}>
         <table>
           <tr>
             <td style={{width:"40%", color: "white", textAlign:"left", fontWeight:"bold"}}>URL<span class="requ"> *</span></td>
@@ -260,23 +263,25 @@ function Kotranscode2() {
             <td></td>
           </tr>
         </table>
-        
       </div>
-      <div style={{color:"red"}}>
-        추가 할 기능 : 한글만 있는게 아니라 "test-형" 이런식의 글자도 있기 때문에 어떻게 처리할지 고민좀 해봐야 한다.
-      </div>
-      
-       <div id="directoryarea" style={{textAlign:"left" ,background:"black",color:"white",display:"none", height: "300px", overflowY: "scroll"}}>
-            {directory.map((item, index) => {
-               const updatedItem = item.replace('^update', '').replace('^insert', ''); // ^update와 ^insert 제거
 
-                return (
-                    <li key={index} style={{ color: item.includes('^update') ? 'red' : (item.includes('^insert') ? 'blue' : 'white') }}>
-                        {updatedItem}
-                    </li>
-                );
-            })}
-        </div>
+    </div>
+    <div style={{width:"20px"}}></div>
+    <div style={{height:"500px", width:"100%", backgroundColor: "#31353f"}}>
+      <div id="directoryarea" style={{paddingLeft:"10px",textAlign:"left" ,background:"#31353f",color:"white",display:"none", height: "100%", overflowY: "scroll"}}>
+              {directory.map((item, index) => {
+                const updatedItem = item.replace('^update', '').replace('^insert', ''); // ^update와 ^insert 제거
+
+                  return (
+                      <li key={index} style={{ color: item.includes('^update') ? 'red' : (item.includes('^insert') ? 'blue' : 'white') }}>
+                          {updatedItem}
+                      </li>
+                  );
+              })}
+          </div>
+      </div>
+    </div>
+              <Ads/>
     </div>
   );
 }
