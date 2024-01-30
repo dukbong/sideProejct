@@ -5,14 +5,15 @@ Reason for planning : The reason for creating this website is to solve the probl
 The project consists of Front : React and Back : Spring boot.
 
 ### How to use the website
-1. Enter the DB url, username, and password.
+1. Enter your DB Url, Username, and Password. If there is no password, leave it blank.
 2. In the case of DB drivers ***Oracle, MySQL 8.x, MariaDB, and H***2 can be omitted.
 3. Write SQL queries for multilingual processing.
 4. You can write a SQL query for multilingual processing. At this time, there ***must be two columns*** and ***no alias*** should be given to the search column.
 5. Press the TEST button to check the results and confirm if they are correct, or rewrite if not.
-6. Select the extension you want to change.
-7. Attach the attachment and press the send button.
-8. The download will proceed automatically after some time.
+6. When converting Hangul to any code, you must specify the prefix and suffix. The ***prefix is ​​required***, but the suffix is ​​not.
+7. Select the extension you want to change.
+8. Attach the attachment and press the send button.
+9. The download will proceed automatically after some time.
 
 ### How to create an attachment
 The extension of the attached file must be ***zip*** and the attached file must always have a ***root folder***.
