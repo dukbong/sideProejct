@@ -156,32 +156,40 @@ function Kotranscode2() {
       <div style={{width:"500px"}}>
         <table>
           <tr>
-            <td style={{width:"40%", color: "white", textAlign:"left", fontWeight:"bold"}}>URL : </td>
-            <td style={{width:"60%"}}><input type="text" id="url" name="url" style={{width:"100%"}}/></td>
+            <td style={{width:"40%", color: "white", textAlign:"left", fontWeight:"bold"}}>URL<span class="requ"> *</span></td>
+            <td style={{width:"100%"}}><input type="text" id="url" name="url" style={{width:"100%",height : "30px", boxSizing: "border-box"}} placeholder="ex) jdbc:oracle:thin:@localhost:8080/test"/></td>
           </tr>
           <tr>
-            <td style={{width:"40%", color: "white", textAlign:"left", fontWeight:"bold"}}>USERNAME : </td>
-            <td style={{width:"60%"}}><input type="text" id="username" name="username" style={{width:"100%"}}/></td>
+            <td style={{width:"40%", color: "white", textAlign:"left", fontWeight:"bold"}}>USERNAME<span class="requ"> *</span></td>
+            <td style={{width:"60%"}}><input type="text" id="username" name="username" style={{width:"100%",height : "30px", boxSizing: "border-box"}} placeholder="ex) username"/></td>
           </tr>
           <tr>
-            <td style={{width:"40%", color: "white", textAlign:"left", fontWeight:"bold"}}>PASSWORD : </td>
-            <td style={{width:"60%"}}><input type="text" id="password" name="password" style={{width:"100%"}}/></td>
+            <td style={{width:"40%", color: "white", textAlign:"left", fontWeight:"bold"}}>PASSWORD<span class="requ"> *</span></td>
+            <td style={{width:"60%"}}><input type="text" id="password" name="password" style={{width:"100%",height : "30px", boxSizing: "border-box"}} placeholder="ex) password"/></td>
           </tr>
           <tr>
-            <td style={{width:"40%", color: "white", textAlign:"left"}}>DRIVER : </td>
-            <td style={{width:"60%"}}><input type="text" id="driver" name="driver" style={{width:"100%"}}/></td>
-          </tr>
-          {/* <tr>
-            <td></td>
-            <td style={{textAlign:"left", color:"white"}}>가능 : Oracle, MySQL, MariaDB, H2</td>
-          </tr> */}
-          <tr>
-            <td style={{width:"40%", color: "white", textAlign:"left", fontWeight:"bold"}}>QUERY : </td>
-            <td style={{width:"50%"}}><input type="text" id="searchQuery" name="searchQuery" style={{width:"100%"}}/></td>
-            <td style={{width:"10%"}}><button onClick={queryTest} style={{width:"100%", marginLeft:"5px"}}>Test</button></td>
+            <td style={{width:"40%", color: "white", textAlign:"left"}}>DRIVER</td>
+            <td style={{width:"60%"}}><input type="text" id="driver" name="driver" style={{width:"100%",height : "30px", boxSizing: "border-box"}} placeholder="Please read the user manual."/></td>
           </tr>
           <tr>
-            <td style={{width:"40%", color: "white", textAlign:"left", fontWeight:"bold"}}>EXTENSION : </td>       
+            <td style={{width:"40%", color: "white", textAlign:"left", fontWeight:"bold"}}>QUERY<span class="requ"> *</span></td>
+            <td style={{display:"flex"}}>
+              <input type="text" id="searchQuery" name="searchQuery" style={{width:"100%",height : "30px", boxSizing: "border-box"}} placeholder="ex) SELECT KO, CODE FROM LANG"/>
+              <button onClick={queryTest} style={{width:"16%", marginLeft:"1%", boxSizing: "border-box"}} class="custom-button">TEST</button>
+            </td>
+          </tr>
+          <tr>
+            <td style={{width:"40%", color: "white", textAlign:"left", fontWeight:"bold"}}>PREFIX + SUFFIX<span class="requ"> *</span></td>
+            <td style={{display: "flex"}}>
+              <input type="text" id="searchQuery" name="searchQuery" style={{width:"100%",height : "30px", boxSizing: "border-box"}} placeholder="ex) ${msg."/>
+              <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", color: "white", width: "100%", boxSizing: "border-box", marginLeft: "1%", marginRight: "1%" }}>
+                CODE
+              </div>
+              <input type="text" id="searchQuery" name="searchQuery" style={{width:"100%",height : "30px", boxSizing: "border-box"}} placeholder="ex) }"/>
+            </td>
+          </tr>
+          <tr>
+            <td style={{width:"40%", color: "white", textAlign:"left", fontWeight:"bold"}}>EXTENSION<span class="requ"> *</span></td>       
             <td>
               <fieldset id="extensionFiled">
                 <legend style={{color:"white"}}>Choose File Extension:</legend>
@@ -198,7 +206,7 @@ function Kotranscode2() {
             </td>
           </tr>
           <tr>
-            <td style={{width:"40%", color: "white", textAlign:"left", fontWeight:"bold"}}>FILE TAMPERING : </td>
+            <td style={{width:"40%", color: "white", textAlign:"left", fontWeight:"bold"}}>FILE TAMPERING</td>
             <td>
             <input id="filechang" type="file" ref={fileInput} onChange={handleChange} readOnly style={{color:"white", fontSize: "15px", width:"80%"}}/>
             <button id="sendfile" style={{fontSize: "15px", width:"20%"}} onClick={handleFileUpload}>전송</button>
@@ -209,7 +217,7 @@ function Kotranscode2() {
             <td><p style={{color:"white", fontSize:"15px", textAlign:"left"}}>자동으로 다운로드 됩니다.&nbsp;&nbsp;<span id="loading-spinner"></span></p></td>
           </tr>
           <tr>
-            <td colSpan={2} style={{color:"white", textAlign:"left", fontWeight:"bold"}}>사용 설명서 : <a href = "https://github.com/dukbong/sideProejct">gitHub 방문</a></td>
+            <td colSpan={2} style={{color:"white", textAlign:"left", fontWeight:"bold"}}>사용 설명서 : <a href = "https://github.com/dukbong/sideProejct">GitHub 방문</a></td>
           </tr>
           <tr>
             <td></td>
@@ -217,6 +225,9 @@ function Kotranscode2() {
           </tr>
         </table>
         
+      </div>
+      <div style={{color:"red"}}>
+        추가 할 기능 : prefix, suffix 넘겨서 그걸 이용해서 변조하기.
       </div>
       
        <div id="directoryarea" style={{textAlign:"left" ,background:"black",color:"white",display:"none", height: "300px", overflowY: "scroll"}}>
