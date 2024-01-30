@@ -1,7 +1,6 @@
 package api.kotrans.kotranscode.service;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.mapping.Environment;
@@ -48,14 +47,7 @@ public class DynamicDatabaseService {
 			// 접속 (세션) 확인 작업 공간
 			// ===================================================
 			KoTransCodeDao mapper = sqlSession.getMapper(KoTransCodeDao.class);
-			Long start = System.currentTimeMillis();
-			List<ResultDao> result = mapper.connTest(ChangeQueryConfig.changeQuery(dbInfo.getSearchQuery()));
-//			for(ResultDao rd : result) {
-//				System.out.println("key = " + rd.getTransKey() + ", value = " + rd.getTransValue());
-//			}
-			Long end = System.currentTimeMillis();
-			System.out.println("쿼리 실행 시간 : " + ((end - start) / 1000) + "초 소요");
-			return result;
+			return mapper.connTest(ChangeQueryConfig.changeQuery(dbInfo.getSearchQuery()));
 			// ===================================================
 		} catch (Exception e) {
 			e.printStackTrace();

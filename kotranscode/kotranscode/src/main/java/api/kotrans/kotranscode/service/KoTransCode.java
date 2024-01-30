@@ -1,7 +1,5 @@
 package api.kotrans.kotranscode.service;
 
-import java.util.List;
-
 import org.springframework.web.multipart.MultipartFile;
 
 import api.kotrans.kotranscode.domain.DbInfo;
@@ -14,7 +12,4 @@ public interface KoTransCode {
 
 //	ZipFile CodeExchange2(MultipartFile file, String[] searchCondition, String searchQuery);
 	ZipFile CodeExchange2(MultipartFile file, DbInfo dbInfo);
-
-	List<String> testCode(String query);
-
 }

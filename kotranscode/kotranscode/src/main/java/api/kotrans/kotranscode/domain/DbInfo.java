@@ -2,8 +2,6 @@ package api.kotrans.kotranscode.domain;
 
 import java.util.Arrays;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,6 +20,7 @@ public class DbInfo{
 	private String password;
 	private String driver;
 	private String[] searchList;
+	private String[] exprefix;
 	private String searchQuery;
 	private String prefix;
 	private String suffix;

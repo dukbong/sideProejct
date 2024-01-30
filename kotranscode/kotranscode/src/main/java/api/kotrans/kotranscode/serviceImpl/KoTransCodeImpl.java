@@ -33,7 +33,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import api.kotrans.kotranscode.config.ChangeQueryConfig;
-import api.kotrans.kotranscode.dao.KoTransCodeDao;
 import api.kotrans.kotranscode.domain.DbInfo;
 import api.kotrans.kotranscode.domain.ResultDao;
 import api.kotrans.kotranscode.domain.TransformationRequest;
@@ -46,7 +45,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class KoTransCodeImpl implements KoTransCode {
 
-	private final KoTransCodeDao koTransCodeDao;
 	private final DynamicDatabaseService dynamicDatabaseService;
 
 	@Override
@@ -170,7 +168,7 @@ public class KoTransCodeImpl implements KoTransCode {
 			testResult.add(testDir);
 			// testResult.addAll(printDirectory(unzipDirectory, tempDirectory.toString(),testDir, searchCondition));
 //			testResult.addAll(printDirectory(unzipDirectory, testDirectory.toString(), testDir, searchCondition)); // 여기에 Map 추가해서 넣기.
-			testResult.addAll(printDirectory(unzipDirectory, testDirectory.toString(), testDir, dbInfo.getSearchList(), resultMap, new String[]{dbInfo.getPrefix(), dbInfo.getSuffix()})); // 여기에 Map 추가해서 넣기.
+			testResult.addAll(printDirectory(unzipDirectory, testDirectory.toString(), testDir, dbInfo.getSearchList(), resultMap, new String[]{dbInfo.getPrefix(), dbInfo.getSuffix()}, dbInfo.getExprefix())); // 여기에 Map 추가해서 넣기.
 			System.out.println("디렉토리 구조 파악 및 파일 수정 까지 완료 : " + ((System.currentTimeMillis() - start) / 1000) + "초 소요");
 			start = System.currentTimeMillis();
 
@@ -287,7 +285,7 @@ public class KoTransCodeImpl implements KoTransCode {
 	}
 
 	// 압축 푼것의 구조를 파악한다.
-	private ArrayList<String> printDirectory(String directoryPath, String tempDirectory, String folderName, String[] searchCondition, List<ResultDao> resultMap, String[] preSuffix) {
+	private ArrayList<String> printDirectory(String directoryPath, String tempDirectory, String folderName, String[] searchCondition, List<ResultDao> resultMap, String[] preSuffix, String[] exPrefix) {
 		ArrayList<String> list = new ArrayList<>(); // 확인용
 		try (Stream<Path> paths = Files.walk(Paths.get(tempDirectory + "\\" + folderName))) {
 			Path root = Paths.get(tempDirectory + "\\" + folderName);
@@ -297,7 +295,7 @@ public class KoTransCodeImpl implements KoTransCode {
 				for (int j = 0; j < searchCondition.length; j++) {
 					if (i.endsWith(searchCondition[j])) {
 						String fileContent = FileContent(tempDirectory, folderName, i);
-						int check = FileWrite(tempDirectory, folderName, i, fileContent, resultMap, preSuffix);
+						int check = FileWrite(tempDirectory, folderName, i, fileContent, resultMap, preSuffix, exPrefix);
 						
 						// 1 : 변경 완료 | 2: 인서트 필요 | 3: 변화 헚음
 						switch(check){
@@ -340,7 +338,7 @@ public class KoTransCodeImpl implements KoTransCode {
 	}
 
 	// 파일 수정
-	private int FileWrite(String tempDirectory, String folderName, String targetFile, String fileContent, List<ResultDao> resultMap, String[] preSuffix) {
+	private int FileWrite(String tempDirectory, String folderName, String targetFile, String fileContent, List<ResultDao> resultMap, String[] preSuffix, String[] exPrefix) {
 		int result = 3;
 		StringBuilder sb = new StringBuilder();
 		sb.append(tempDirectory).append("\\").append(folderName).append("\\").append(targetFile);
@@ -362,47 +360,50 @@ public class KoTransCodeImpl implements KoTransCode {
 						row = row.replaceAll("<%--(.*?)--%>", "");
 					}
 
-					Pattern pattern = Pattern.compile("[가-힣]+");
+					Pattern pattern = Pattern.compile("<[^>]*>(.*?)<\\/[^>]*>"); // 태그 안에 글자 가져오기
 					Matcher matcher = pattern.matcher(row);
 					StringBuilder resultBuilder = new StringBuilder();
 
 					while (matcher.find()) {
-						resultBuilder.append(matcher.group());
+						resultBuilder.append(matcher.group(1));
 						resultBuilder.append(" "); // Add space
 					}
 
 					// 한글이 존재한다면 해당 조건에 걸린 후 변경된다.
 					if (!resultBuilder.toString().equals("")) {
-						// =====================DB작업 : SELECT=====================
 						String oldChar = resultBuilder.toString().trim();
-						boolean boo = false;
-						for(ResultDao rd : resultMap){
-							if(rd.getTransKey().equals(oldChar)){
-								row = row.replace(oldChar, preSuffix[0] + rd.getTransValue() + preSuffix[1]);
-								if(result != 2){
-									result = 1;
+						boolean prefixTest = oldChar.startsWith(preSuffix[0]); // 우선 현재 prefix와 같으면 제외
+						for(String expre : exPrefix){
+							prefixTest = oldChar.startsWith(expre);
+						}
+
+						if (!prefixTest) {
+							boolean boo = false;
+							for (ResultDao rd : resultMap) {
+								if (rd.getTransKey().equals(oldChar)) {
+									row = row.replace(oldChar, preSuffix[0] + rd.getTransValue() + preSuffix[1]);
+									if (result != 2) {
+										result = 1;
+									}
+									boo = true;
+									break;
 								}
-								boo = true;
-								break;
 							}
-						}
-						if(!boo){
-							result = 2;
-						}
-						// =====================DB작업 : SELECT=====================
-						
-						if(result != 2){
-							row += " <!-- " + resultBuilder.toString() + " -->\n";
-							if (targetFile.endsWith(".jsp")) {
-								row += " <%-- " + arr[i] + " --%>\n";
-							}else{
-								row += " <!-- " + arr[i] + " -->\n";
+							if (!boo) {
+								result = 2;
 							}
-							
-							
-							sb.append(row).append("\n");
-							
-							continue;
+							if (result != 2) {
+								row += " <!-- " + resultBuilder.toString() + " -->\n";
+								if (targetFile.endsWith(".jsp")) {
+									row += " <%-- " + arr[i] + " --%>\n";
+								} else {
+									row += " <!-- " + arr[i] + " -->\n";
+								}
+
+								sb.append(row).append("\n");
+
+								continue;
+							}
 						}
 					}
 					sb.append(arr[i]).append("\n");
@@ -464,11 +465,6 @@ public class KoTransCodeImpl implements KoTransCode {
 			e.printStackTrace();
 		}
 		return result;
-	}
-
-	@Override
-	public List<String> testCode(String query) {
-		return koTransCodeDao.testCode(query);
 	}
 
 }

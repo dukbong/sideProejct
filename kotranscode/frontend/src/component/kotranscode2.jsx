@@ -10,10 +10,6 @@ function Kotranscode2() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [directory, setDirectory] = useState([]);
 
-  // const handleButtonClick = (e) => {
-  //   fileInput.current.click();
-  // };
-
   useEffect(() => {
     axios.get("currentInfo")
     .then((res) => {
@@ -34,6 +30,15 @@ function Kotranscode2() {
             }
           })
         })
+        const excludePrefix = Array.from(res.data.exprefix);
+        let exprefixStr = "";
+        for(let i = 0; i < excludePrefix.length; i++){
+          exprefixStr += excludePrefix[i]
+          if(i !== excludePrefix.length - 2){
+            exprefixStr += ",";
+          }
+        }
+        document.getElementById("exprefix").value = exprefixStr;
       }
     })
   }, []);
@@ -80,6 +85,7 @@ function Kotranscode2() {
       formData.append("password", document.getElementById("password").value);
       formData.append("prefix", document.getElementById("prefix").value);
       formData.append("suffix", document.getElementById("suffix").value);
+      formData.append("exprefix", document.getElementById("exprefix").value);
          
 
       // document.getElementById("changing").style.display = "block";
@@ -226,6 +232,10 @@ function Kotranscode2() {
               </div>
               <input type="text" id="suffix" name="suffix" style={{width:"100%",height : "30px", boxSizing: "border-box"}} placeholder="ex) }"/>
             </td>
+          </tr>
+          <tr>
+            <td style={{width:"40%", color: "white", textAlign:"left", fontWeight:"bold"}}>PREFIX TO EXCLUDE</td>
+            <td style={{width:"60%"}}><input type="text" id="exprefix" name="exprefix" style={{width:"100%",height : "30px", boxSizing: "border-box"}} placeholder="Please write a prefix to exclude when searching."/></td>
           </tr>
           <tr>
             <td style={{width:"40%", color: "white", textAlign:"left", fontWeight:"bold"}}>EXTENSION<span class="requ"> *</span></td>       

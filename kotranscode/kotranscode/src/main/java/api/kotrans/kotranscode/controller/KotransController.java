@@ -1,5 +1,6 @@
 package api.kotrans.kotranscode.controller;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -52,8 +53,14 @@ public class KotransController {
 												@RequestParam("searchList") String searchList, @RequestParam("searchQuery") String searchQuery,
 												@RequestParam("driver") String driver, @RequestParam("username") String username,
 												@RequestParam("password") String password, @RequestParam("url") String url,
-												@RequestParam("prefix") String prefix, @RequestParam("suffix") String suffix, HttpSession session) {
-		DbInfo dbInfo = new DbInfo(url, username, password, driver, searchList.split(","), searchQuery, prefix, suffix);
+												@RequestParam("prefix") String prefix, @RequestParam("suffix") String suffix,
+												@RequestParam("exprefix") String exprefix, HttpSession session) {
+		String[] exprefixArr = Arrays.stream(exprefix.split(","))
+					                 .map(String::trim)
+					                 .toArray(String[]::new);
+		String[] listarr = searchList.split(",");
+		
+		DbInfo dbInfo = new DbInfo(url, username, password, driver, listarr, exprefixArr, searchQuery, prefix, suffix);
 		dbInfo.dbCheck();
 		// 세션에 저장
 		DbInfo checkDbInfo = (DbInfo) session.getAttribute("dbInfo");
@@ -62,7 +69,7 @@ public class KotransController {
 			// 세션에 저장되있는것과 지금 입력된 값이 다르면 새롭게 세션에 저장
 			session.setAttribute("dbInfo",
 					new DbInfo(dbInfo.getUrl(), dbInfo.getUsername(), dbInfo.getPassword(), dbInfo.getDriver(),
-							dbInfo.getSearchList(), dbInfo.getSearchQuery(), dbInfo.getPrefix(), dbInfo.getSuffix()));
+							dbInfo.getSearchList(), dbInfo.getExprefix(), dbInfo.getSearchQuery(), dbInfo.getPrefix(), dbInfo.getSuffix()));
 		}
 
 		try {

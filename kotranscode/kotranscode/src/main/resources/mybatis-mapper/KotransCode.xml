@@ -2,46 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="api.kotrans.kotranscode.dao.KoTransCodeDao">
 
-
-<select id = "getKoCode" parameterType="api.kotrans.kotranscode.domain.QueryInfo" resultType="String">
-	${query} where value = #{oldChar}
-</select>
-<select id = "testCode" parameterType="String" resultType="String">
-	${query}
-</select>
-
 <select id="connTest" resultType="api.kotrans.kotranscode.domain.ResultDao">
 	${query}
 </select>
-
-<select id="getCode" resultType="String">
-    SELECT LANG_CODE
-    FROM SY_LANG_MASTR
-    WHERE REPLACE(LANG_NM, ' ', '') = REPLACE(TRIM(#{oldChar}), ' ', '')
-      OR LANG_NM = TRIM(#{oldChar})
-	
-<!-- 	SELECT LANG_CODE
-	FROM SY_LANG_MASTR
-	WHERE REPLACE(LANG_NM, ' ', '') = #{oldChar}
-	OR LANG_NM = #{oldChar} -->
-</select>
-
-<select id="getLastCode">
-	<!-- SELECT 'c'||LPAD(TO_NUMBER(LTRIM(SUBSTR(LANG_CODE, 2), '0')) + 1, 9, '0') AS NEW_LANG_CODE FROM SY_LANG_MASTR WHERE ROWNUM = 1 ORDER BY LANG_MASTR_SEQNO DESC -->
-	
-	SELECT 'c' || LPAD(CAST(CAST(LTRIM(SUBSTRING(LANG_CODE, 2), '0') AS INT) + 1 AS VARCHAR(10)), 9, '0') AS NEW_LANG_CODE
-	FROM SY_LANG_MASTR
-	ORDER BY LANG_MASTR_SEQ DESC
-	LIMIT 1
-</select>
-
-<insert id="addCode" parameterType="api.kotrans.kotranscode.domain.LangMstr">
-	<!-- INSERT INTO SY_LANG_MASTER VALUES (LANG_SEQ.NEXTVAL, #{langNm}, 'Y', 'N', 'admin', #{lastChangeDt}, #{langCode}) -->
-	
-	INSERT INTO SY_LANG_MASTER
-	(LANG_MASTR_SEQ, LANG_NM, USE_AT, DELETE_AT, LAST_CHANGER_ID, LAST_CHANGE_DT, LANG_CODE) 
-	VALUES
-	(NEXT VALUE FOR LANG_SEQ, #{langNm}, 'Y', 'N', 'admin', #{lastChangeDt}, #{langCode})
-</insert>
 
 </mapper>
