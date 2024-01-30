@@ -29,7 +29,20 @@ The extension of the attached file must be ***zip*** and the attached file must 
 
 It should have a directory structure like the example below.
 
-<img width="446" alt="image" src="https://github.com/dukbong/sideProejct/assets/37864182/a32612ca-b212-49ed-9794-90fae7d4cc73">
+```
+
+src
+│
+├── main
+│   ├── java ...
+│   ├── resources ...  
+│   └── webapp ...       
+│               
+└── test
+    └── java ...
+             
+```
+
 
 ### How large can the attached file be?
 Currently, up to 100MB is possible, and according to test results, it takes about ***35 seconds for 30MB***.
