@@ -136,26 +136,20 @@ public class KoTransCodeImpl implements KoTransCode {
 			// 루트 경로를 보여준다.
 			String currentWorkingDirectory = System.getProperty("user.dir");
 //			System.out.println("currentWorkingDirectory = " + currentWorkingDirectory);
-
 			Path projectRoot = Paths.get(currentWorkingDirectory); // 절대 경로로 표시
 //			 System.out.println("projectRoot : " + projectRoot.toString());
 			Path tempDirectory = Files.createDirectories(projectRoot.resolve("temp-zip")); // temp-zip이라는 폴더의  경로
 //			 System.out.println("temDirectory : " + tempDirectory);
-
 			Path testDirectory = Files.createDirectories(tempDirectory.resolve(uid.toString())); // temp-zip이라는  폴더의  경로
 			// Path uploadedFilePath = tempDirectory.resolve(file.getOriginalFilename());
 			Path uploadedFilePath = testDirectory.resolve(file.getOriginalFilename());
 
-			Files.copy(file.getInputStream(), uploadedFilePath, StandardCopyOption.REPLACE_EXISTING); // 폴더
-																										// 생성
-																										// file.getOriginalFilename()
-
+			Files.copy(file.getInputStream(), uploadedFilePath, StandardCopyOption.REPLACE_EXISTING); // 폴더 생성 file.getOriginalFilename()
 			// String unzipDirectory = unzip(uploadedFilePath.toString(), tempDirectory.toString());
 			String unzipDirectory = unzip(uploadedFilePath.toString(), testDirectory.toString());
 
 			System.out.println("압축 해제 완료 및 폴더 생성 완료 : " + ((System.currentTimeMillis() - start) / 1000) + "초 소요");
 			start = System.currentTimeMillis();
-
 			// System.out.println("unzipDirectory : " + unzipDirectory);
 			String[] directoryAddressArr = unzipDirectory.split("[\\\\/]");
 
@@ -176,8 +170,7 @@ public class KoTransCodeImpl implements KoTransCode {
 			testResult.add(testDir);
 			// testResult.addAll(printDirectory(unzipDirectory, tempDirectory.toString(),testDir, searchCondition));
 //			testResult.addAll(printDirectory(unzipDirectory, testDirectory.toString(), testDir, searchCondition)); // 여기에 Map 추가해서 넣기.
-			testResult.addAll(printDirectory(unzipDirectory, testDirectory.toString(), testDir, dbInfo.getSearchList(), resultMap)); // 여기에 Map 추가해서 넣기.
-
+			testResult.addAll(printDirectory(unzipDirectory, testDirectory.toString(), testDir, dbInfo.getSearchList(), resultMap, new String[]{dbInfo.getPrefix(), dbInfo.getSuffix()})); // 여기에 Map 추가해서 넣기.
 			System.out.println("디렉토리 구조 파악 및 파일 수정 까지 완료 : " + ((System.currentTimeMillis() - start) / 1000) + "초 소요");
 			start = System.currentTimeMillis();
 
@@ -185,10 +178,7 @@ public class KoTransCodeImpl implements KoTransCode {
 			// 보낼 파일 압축
 			// String newZipPath = makeZip(tempDirectory.toString(), testDir, uid);
 			String newZipPath = makeZip(testDirectory.toString(), testDir, uid);
-
 			System.out.println("압축 파일 생성 완료 : " + ((System.currentTimeMillis() - start) / 1000) + "초 소요");
-			start = System.currentTimeMillis();
-
 			// byte를 base64로 변환 후 보내기
 			Path path = Paths.get(newZipPath);
 			byte[] zipBytes = Files.readAllBytes(path);
@@ -200,59 +190,12 @@ public class KoTransCodeImpl implements KoTransCode {
 
 			// 생성된 파일들 모두 삭제
 			deleteFile(tempDirectory.resolve(uid.toString()));
-			System.out.println("파일 삭제 완료 : " + ((System.currentTimeMillis() - start) / 1000) + "초 소요");
-			start = System.currentTimeMillis();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println("클라이언트에게 전달 완료 : " + ((System.currentTimeMillis() - start) / 1000) + "초 소요");
 		return zip;
 	}
 	
-	// dao에 연결 가능하게 쿼리 변환
-	// ex) select member_id, member_name from member
-	//     select member_id as key, member_name as value from member
-//	public String changeQuery(String query){
-//		query = query.toUpperCase();
-//		String pattern = "SELECT(.*?)FROM";
-//        Pattern regex = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-//        Matcher matcher = regex.matcher(query);
-//
-//        
-//        List<String> resultList = new ArrayList<>();
-//        if (matcher.find()) {
-//            String result = matcher.group(1).trim();
-//            String[] resultArr = result.split(",");
-//            for(String str : resultArr){
-//                str = str.trim(); // 우선 공백 제거
-//                if(str.split(" ").length != 1){
-//                    resultList.add(str.split(" ")[0]);
-//                }else{
-//                    resultList.add(str);
-//                }
-//            }
-//            if(resultList.size() > 2){
-//            	return "There are many columns.";
-//            }else{
-//                // 사용자 쿼리를 DAO에서 가져올 수 있도록 수정
-//            	try{
-//            		for(int i = 0; i < 2; i++){
-//            			if(i == 0){
-//            				query = query.replace(resultArr[0], resultList.get(0) + " AS TRANSKEY");
-//            			}else{
-//            				query = query.replace(resultArr[1], resultList.get(1) + " AS TRANSVALUE");
-//            			}
-//            		}
-//            		return query;
-//            	}catch(ArrayIndexOutOfBoundsException e){
-//            		return "There are few columns.";
-//            	}
-//            }
-//        } else {
-//            return "This is an invalid SQL query.";
-//        }
-//	}
-
 	// Files.delete() 메소드는 비어있는 폴더 또는 일반 파일만 가능하다.
 	private void deleteFile(Path deleteFilePath) {
 		try{
@@ -286,17 +229,14 @@ public class KoTransCodeImpl implements KoTransCode {
 		
 		try {
 			zipFolder(sourceFolderPath, zipFilePath);
-			System.out.println("압축이 완료되었습니다.");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 		return zipFilePath;
 	}
 
 	public void zipFolder(String sourceFolderPath, String zipFilePath) throws IOException {
 		try (FileOutputStream fos = new FileOutputStream(zipFilePath); ZipOutputStream zos = new ZipOutputStream(fos)) {
-
 			File sourceFolder = new File(sourceFolderPath);
 			zipFile(sourceFolder, sourceFolder.getName(), zos);
 		}
@@ -347,7 +287,7 @@ public class KoTransCodeImpl implements KoTransCode {
 	}
 
 	// 압축 푼것의 구조를 파악한다.
-	private ArrayList<String> printDirectory(String directoryPath, String tempDirectory, String folderName, String[] searchCondition, List<ResultDao> resultMap) {
+	private ArrayList<String> printDirectory(String directoryPath, String tempDirectory, String folderName, String[] searchCondition, List<ResultDao> resultMap, String[] preSuffix) {
 		ArrayList<String> list = new ArrayList<>(); // 확인용
 		try (Stream<Path> paths = Files.walk(Paths.get(tempDirectory + "\\" + folderName))) {
 			Path root = Paths.get(tempDirectory + "\\" + folderName);
@@ -357,15 +297,16 @@ public class KoTransCodeImpl implements KoTransCode {
 				for (int j = 0; j < searchCondition.length; j++) {
 					if (i.endsWith(searchCondition[j])) {
 						String fileContent = FileContent(tempDirectory, folderName, i);
-						boolean check = FileWrite(tempDirectory, folderName, i, fileContent, resultMap);
-						// 변경이 되었을 경우
-						if (check) {
-							i += "^update";
+						int check = FileWrite(tempDirectory, folderName, i, fileContent, resultMap, preSuffix);
+						
+						// 1 : 변경 완료 | 2: 인서트 필요 | 3: 변화 헚음
+						switch(check){
+						case 1: i += "^update";
+							break;
+						case 2: i += "^insert";
+							break;
 						}
-						// 변경이 필요하지만 안되었을 경우
-						if (!check) {
-							i += "^insert"; 
-						}
+						
 						break;
 					}
 				}
@@ -381,8 +322,7 @@ public class KoTransCodeImpl implements KoTransCode {
 
 	// 파일 읽기 (하나를 통으로 리턴)
 	public String FileContent(String tempDirectory, String folderName, String targetFile) {
-		// 파일을 열기 위해서 tempDirectory +
-		// directoryAddressArr[directoryAddressArr.length - 1] + "\" + printDirectory안에 있는 지역변수 i를 합쳐줘야한다.
+		// 파일을 열기 위해서 tempDirectory + directoryAddressArr[directoryAddressArr.length - 1] + "\" + printDirectory안에 있는 지역변수 i를 합쳐줘야한다.
 		StringBuilder sb = new StringBuilder();
 		sb.append(tempDirectory).append("\\").append(folderName).append("\\").append(targetFile);
 		String filePath = sb.toString();
@@ -400,8 +340,8 @@ public class KoTransCodeImpl implements KoTransCode {
 	}
 
 	// 파일 수정
-	private boolean FileWrite(String tempDirectory, String folderName, String targetFile, String fileContent, List<ResultDao> resultMap) {
-		boolean result = false;
+	private int FileWrite(String tempDirectory, String folderName, String targetFile, String fileContent, List<ResultDao> resultMap, String[] preSuffix) {
+		int result = 3;
 		StringBuilder sb = new StringBuilder();
 		sb.append(tempDirectory).append("\\").append(folderName).append("\\").append(targetFile);
 		String filePath = sb.toString();
@@ -435,25 +375,35 @@ public class KoTransCodeImpl implements KoTransCode {
 					if (!resultBuilder.toString().equals("")) {
 						// =====================DB작업 : SELECT=====================
 						String oldChar = resultBuilder.toString().trim();
+						boolean boo = false;
 						for(ResultDao rd : resultMap){
 							if(rd.getTransKey().equals(oldChar)){
-								row = row.replace(oldChar, "${msg." + rd.getTransValue() + "}");
-								result = true;
+								row = row.replace(oldChar, preSuffix[0] + rd.getTransValue() + preSuffix[1]);
+								if(result != 2){
+									result = 1;
+								}
+								boo = true;
+								break;
 							}
+						}
+						if(!boo){
+							result = 2;
 						}
 						// =====================DB작업 : SELECT=====================
 						
-						row += " <!-- " + resultBuilder.toString() + " -->\n";
-						if (targetFile.endsWith(".jsp")) {
-							row += " <%-- " + arr[i] + " --%>\n";
-						}else{
-							row += " <!-- " + arr[i] + " -->\n";
+						if(result != 2){
+							row += " <!-- " + resultBuilder.toString() + " -->\n";
+							if (targetFile.endsWith(".jsp")) {
+								row += " <%-- " + arr[i] + " --%>\n";
+							}else{
+								row += " <!-- " + arr[i] + " -->\n";
+							}
+							
+							
+							sb.append(row).append("\n");
+							
+							continue;
 						}
-						
-						
-						sb.append(row).append("\n");
-
-						continue;
 					}
 					sb.append(arr[i]).append("\n");
 				}
@@ -480,11 +430,19 @@ public class KoTransCodeImpl implements KoTransCode {
 					if (!resultBuilder.toString().equals("")) {
 						// =====================DB작업 : SELECT=====================
 						String oldChar = resultBuilder.toString().trim();
+						boolean boo = false;
 						for(ResultDao rd : resultMap){
 							if(rd.getTransKey().equals(oldChar)){
-								row = row.replace(oldChar, "${msg." + rd.getTransValue() + "}");
-								result = true;
+								row = row.replace(oldChar, preSuffix[0] + rd.getTransValue() + preSuffix[1]);
+								if(result != 2){
+									result = 1;
+								}
+								boo = true;
+								break;
 							}
+						}
+						if(!boo){
+							result = 2;
 						}
 						// =====================DB작업 : SELECT=====================
 						

@@ -23,6 +23,8 @@ public class DbInfo{
 	private String driver;
 	private String[] searchList;
 	private String searchQuery;
+	private String prefix;
+	private String suffix;
 	
 	// Test 코드를 보내기 우한 생성자
 	public DbInfo(String url, String username, String password, String driver, String searchQuery){
@@ -60,8 +62,10 @@ public class DbInfo{
 		int result = 1;
 		result = prime * result + ((driver == null) ? 0 : driver.hashCode());
 		result = prime * result + ((password == null) ? 0 : password.hashCode());
+		result = prime * result + ((prefix == null) ? 0 : prefix.hashCode());
 		result = prime * result + Arrays.hashCode(searchList);
 		result = prime * result + ((searchQuery == null) ? 0 : searchQuery.hashCode());
+		result = prime * result + ((suffix == null) ? 0 : suffix.hashCode());
 		result = prime * result + ((url == null) ? 0 : url.hashCode());
 		result = prime * result + ((username == null) ? 0 : username.hashCode());
 		return result;
@@ -88,12 +92,22 @@ public class DbInfo{
 				return false;
 		} else if (!password.equals(other.password))
 			return false;
+		if (prefix == null) {
+			if (other.prefix != null)
+				return false;
+		} else if (!prefix.equals(other.prefix))
+			return false;
 		if (!Arrays.equals(searchList, other.searchList))
 			return false;
 		if (searchQuery == null) {
 			if (other.searchQuery != null)
 				return false;
 		} else if (!searchQuery.equals(other.searchQuery))
+			return false;
+		if (suffix == null) {
+			if (other.suffix != null)
+				return false;
+		} else if (!suffix.equals(other.suffix))
 			return false;
 		if (url == null) {
 			if (other.url != null)
@@ -107,5 +121,4 @@ public class DbInfo{
 			return false;
 		return true;
 	}
-
 }

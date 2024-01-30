@@ -22,6 +22,8 @@ function Kotranscode2() {
         document.getElementById("password").value = res.data.password;
         document.getElementById("driver").value = res.data.driver;
         document.getElementById("searchQuery").value = res.data.searchQuery;
+        document.getElementById("prefix").value = res.data.prefix;
+        document.getElementById("suffix").value = res.data.suffix;
         const searchList = res.data.searchList;
         Array.from(searchList).forEach((i) => {
           const checkbox = document.querySelectorAll("#extensionFiled input[type=checkbox]");
@@ -42,6 +44,14 @@ function Kotranscode2() {
   };
 
   const handleFileUpload = () => {
+
+    if(document.getElementById("url").value === '' || document.getElementById("username").value === '' ||
+       document.getElementById("prefix").value === '' || document.getElementById("searchQuery").value === '' ||
+       !(document.querySelectorAll("#extensionFiled #jsp")[0].checked || document.querySelectorAll("#extensionFiled #js")[0].checked)){
+        alert("Please enter all required values.");
+        return;
+       }
+
     if (selectedFile) {
       const formData = new FormData();
       // 1. 첨부 파일
@@ -67,12 +77,16 @@ function Kotranscode2() {
       formData.append("url", document.getElementById("url").value);
       formData.append("username", document.getElementById("username").value);
       formData.append("password", document.getElementById("password").value);
+      formData.append("prefix", document.getElementById("prefix").value);
+      formData.append("suffix", document.getElementById("suffix").value);
          
 
       // document.getElementById("changing").style.display = "block";
       document.getElementById("sendfile").disabled = true;
       document.getElementById("filechang").disabled = true;
       document.getElementById("loading-spinner").style.display = "inline-block";
+
+
 
       axios
         .post("koTransCode2", formData, {
@@ -187,7 +201,7 @@ function Kotranscode2() {
           </tr>
           <tr>
             <td style={{width:"40%", color: "white", textAlign:"left", fontWeight:"bold"}}>PASSWORD<span class="requ"> *</span></td>
-            <td style={{width:"60%"}}><input type="text" id="password" name="password" style={{width:"100%",height : "30px", boxSizing: "border-box"}} placeholder="ex) password"/></td>
+            <td style={{width:"60%"}}><input type="text" id="password" name="password" style={{width:"100%",height : "30px", boxSizing: "border-box"}} placeholder="ex) password, Can be omitted if not present"/></td>
           </tr>
           <tr>
             <td style={{width:"40%", color: "white", textAlign:"left"}}>DRIVER</td>
@@ -203,11 +217,11 @@ function Kotranscode2() {
           <tr>
             <td style={{width:"40%", color: "white", textAlign:"left", fontWeight:"bold"}}>PREFIX + SUFFIX<span class="requ"> *</span></td>
             <td style={{display: "flex"}}>
-              <input type="text" id="searchQuery" name="searchQuery" style={{width:"100%",height : "30px", boxSizing: "border-box"}} placeholder="ex) ${msg."/>
+              <input type="text" id="prefix" name="prefix" style={{width:"100%",height : "30px", boxSizing: "border-box"}} placeholder="ex) ${msg."/>
               <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", color: "white", width: "100%", boxSizing: "border-box", marginLeft: "1%", marginRight: "1%" }}>
                 CODE
               </div>
-              <input type="text" id="searchQuery" name="searchQuery" style={{width:"100%",height : "30px", boxSizing: "border-box"}} placeholder="ex) }"/>
+              <input type="text" id="suffix" name="suffix" style={{width:"100%",height : "30px", boxSizing: "border-box"}} placeholder="ex) }"/>
             </td>
           </tr>
           <tr>
@@ -249,7 +263,7 @@ function Kotranscode2() {
         
       </div>
       <div style={{color:"red"}}>
-        추가 할 기능 : prefix, suffix 넘겨서 그걸 이용해서 변조하기.
+        추가 할 기능 : 한글만 있는게 아니라 "test-형" 이런식의 글자도 있기 때문에 어떻게 처리할지 고민좀 해봐야 한다.
       </div>
       
        <div id="directoryarea" style={{textAlign:"left" ,background:"black",color:"white",display:"none", height: "300px", overflowY: "scroll"}}>

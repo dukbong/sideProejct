@@ -35,84 +35,60 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 public class KotransController {
-//	private final DynamicDataSourceManager dynamicDataSourceManager;
-	private final DynamicDatabaseService  dynamicDatabaseService;
-//	private final DynamicDataSource  dynamicDataSource;
+	// private final DynamicDataSourceManager dynamicDataSourceManager;
+	private final DynamicDatabaseService dynamicDatabaseService;
+	// private final DynamicDataSource dynamicDataSource;
 	private final KoTransCode koTransCodeImpl;
-	
+
 	// 직접 글자 입력 받은 후 변경하여 보여주는 메소드
 	@PostMapping("koTransCode")
 	public TransformationRequest koTransCode(@RequestBody TransformationRequest req) {
 		return koTransCodeImpl.CodeExchange(req);
 	}
-	
+
 	// 첨부파일을 받은 후 디렉토리를 돌며 확장자를 찾아 진행하는 메소드
 	@PostMapping("koTransCode2")
 	public ResponseEntity<ZipFile> koTransCode2(@RequestParam("file") MultipartFile file,
-												@RequestParam("searchList") String searchList,
-												@RequestParam("searchQuery") String searchQuery,
-												@RequestParam("driver") String driver,
-												@RequestParam("username") String username,
-												@RequestParam("password") String password,
-												@RequestParam("url") String url,
-												HttpSession session
-												) {
-		DbInfo dbInfo = new DbInfo(url, username, password, driver, searchList.split(","), searchQuery);
+												@RequestParam("searchList") String searchList, @RequestParam("searchQuery") String searchQuery,
+												@RequestParam("driver") String driver, @RequestParam("username") String username,
+												@RequestParam("password") String password, @RequestParam("url") String url,
+												@RequestParam("prefix") String prefix, @RequestParam("suffix") String suffix, HttpSession session) {
+		DbInfo dbInfo = new DbInfo(url, username, password, driver, searchList.split(","), searchQuery, prefix, suffix);
 		dbInfo.dbCheck();
-		
 		// 세션에 저장
-		DbInfo checkDbInfo = (DbInfo)session.getAttribute("dbInfo");
-		if(checkDbInfo == null || !checkDbInfo.equals(dbInfo)){
+		DbInfo checkDbInfo = (DbInfo) session.getAttribute("dbInfo");
+		if (checkDbInfo == null || !checkDbInfo.equals(dbInfo)) {
 			// null이면 세션에 저장되어있는게 없기 때문에 새롭게 session에 저장
 			// 세션에 저장되있는것과 지금 입력된 값이 다르면 새롭게 세션에 저장
-			session.setAttribute("dbInfo", new DbInfo(dbInfo.getUrl(), dbInfo.getUsername(), dbInfo.getPassword(), dbInfo.getDriver(), dbInfo.getSearchList(), dbInfo.getSearchQuery()));
+			session.setAttribute("dbInfo",
+					new DbInfo(dbInfo.getUrl(), dbInfo.getUsername(), dbInfo.getPassword(), dbInfo.getDriver(),
+							dbInfo.getSearchList(), dbInfo.getSearchQuery(), dbInfo.getPrefix(), dbInfo.getSuffix()));
 		}
-		
-		
-		try{
+
+		try {
 			ZipFile zip = koTransCodeImpl.CodeExchange2(file, dbInfo);
 			return ResponseEntity.ok().body(zip);
-		}catch(Exception e){
+		} catch (Exception e) {
 			return ResponseEntity.ok().body(null);
 		}
 	}
-	
 
-//	사용자 별 DB 연결
-//	@PostMapping("dblogin")
-//	public String dbLogin(@RequestBody DbInfo dbInfo, HttpSession session){
-//		dbInfo.dbCheck(dbInfo.getUrl());
-//		try{
-//			// DB 접속 확인
-//			if(dbInfo.getDriver() == "" || dbInfo.getDriver() == null){
-//				dbInfo.dbCheck(dbInfo.getUrl());
-//			}
-//			session.setAttribute("dbinfo", dbInfo);
-//			dynamicDatabaseService.connectToDatabase((DbInfo)session.getAttribute("dbinfo"));
-//			return "y";
-//		}catch(Exception e){
-//			return "n";
-//		}
-//	}
-	
 	@GetMapping("queryTest")
 	public List<ResultDao> queryTest(@RequestParam("searchQuery") String searchQuery,
-									 @RequestParam("driver") String driver,
-									 @RequestParam("username") String username,
-									 @RequestParam("password") String password,
-									 @RequestParam("url") String url){
-		try{
+								 	 @RequestParam("driver") String driver, @RequestParam("username") String username,
+								 	 @RequestParam("password") String password, @RequestParam("url") String url) {
+		try {
 			DbInfo dbInfo = new DbInfo(url, username, password, driver, searchQuery);
 			dbInfo.dbCheck();
 			return dynamicDatabaseService.connectToDatabase(dbInfo);
-		}catch(Exception e){
+		} catch (Exception e) {
 			return null;
 		}
 	}
-	
+
 	@GetMapping("currentInfo")
-	public DbInfo currentInfo(HttpSession session){
-		DbInfo dbInfo = (DbInfo)session.getAttribute("dbInfo");
+	public DbInfo currentInfo(HttpSession session) {
+		DbInfo dbInfo = (DbInfo) session.getAttribute("dbInfo");
 		return dbInfo;
 	}
 }
