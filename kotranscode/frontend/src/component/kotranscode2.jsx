@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./kotranscode.css";
 import "./kotranscode2.css";
 
@@ -12,6 +12,28 @@ function Kotranscode2() {
   // const handleButtonClick = (e) => {
   //   fileInput.current.click();
   // };
+
+  useEffect(() => {
+    axios.get("currentInfo")
+    .then((res) => {
+      if(res.data !== ''){
+        document.getElementById("url").value = res.data.url;
+        document.getElementById("username").value = res.data.username;
+        document.getElementById("password").value = res.data.password;
+        document.getElementById("driver").value = res.data.driver;
+        document.getElementById("searchQuery").value = res.data.searchQuery;
+        const searchList = res.data.searchList;
+        Array.from(searchList).forEach((i) => {
+          const checkbox = document.querySelectorAll("#extensionFiled input[type=checkbox]");
+          Array.from(checkbox).forEach((j) => {
+            if(j.value === i){
+              j.checked = true;
+            }
+          })
+        })
+      }
+    })
+  }, []);
 
   const handleChange = (e) => {
     // console.log(e.target.files[0]); // 파일 정보를 알 수 있다. [마지막 수정일, 이름, 확장자, 사이즈]
@@ -29,7 +51,7 @@ function Kotranscode2() {
       // const checklist = document.querySelectorAll('#checkboxDiv input[type="checkbox"]');
       const checklist = document.querySelectorAll('#extensionFiled input[type="checkbox"]');
       checklist.forEach((checkbox) => {
-        console.log("value = " + checkbox.value + ", checked = " + checkbox.checked);
+        // console.log("value = " + checkbox.value + ", checked = " + checkbox.checked);
         if(checkbox.checked){
           checkArr.push(checkbox.value);
         }
@@ -115,7 +137,7 @@ function Kotranscode2() {
       }
     })
     .then((res) => {
-      if(res.data == ''){
+      if(res.data === ''){
         throw new Error("쿼리문 작성 오류");
       }
       let testShow = [];

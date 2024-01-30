@@ -1,6 +1,5 @@
 package api.kotrans.kotranscode.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -55,10 +54,20 @@ public class KotransController {
 												@RequestParam("driver") String driver,
 												@RequestParam("username") String username,
 												@RequestParam("password") String password,
-												@RequestParam("url") String url
+												@RequestParam("url") String url,
+												HttpSession session
 												) {
 		DbInfo dbInfo = new DbInfo(url, username, password, driver, searchList.split(","), searchQuery);
 		dbInfo.dbCheck();
+		
+		// 세션에 저장
+		DbInfo checkDbInfo = (DbInfo)session.getAttribute("dbInfo");
+		if(checkDbInfo == null || !checkDbInfo.equals(dbInfo)){
+			// null이면 세션에 저장되어있는게 없기 때문에 새롭게 session에 저장
+			// 세션에 저장되있는것과 지금 입력된 값이 다르면 새롭게 세션에 저장
+			session.setAttribute("dbInfo", new DbInfo(dbInfo.getUrl(), dbInfo.getUsername(), dbInfo.getPassword(), dbInfo.getDriver(), dbInfo.getSearchList(), dbInfo.getSearchQuery()));
+		}
+		
 		
 		try{
 			ZipFile zip = koTransCodeImpl.CodeExchange2(file, dbInfo);
@@ -101,4 +110,9 @@ public class KotransController {
 		}
 	}
 	
+	@GetMapping("currentInfo")
+	public DbInfo currentInfo(HttpSession session){
+		DbInfo dbInfo = (DbInfo)session.getAttribute("dbInfo");
+		return dbInfo;
+	}
 }
