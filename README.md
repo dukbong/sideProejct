@@ -6,7 +6,7 @@ The project consists of React and Spring boot.
 1. Enter the DB url, username, and password.
 2. In the case of DB drivers ***Oracle, MySQL 8.x, MariaDB, and H***2 can be omitted.
 3. Write SQL queries for multilingual processing.
-4. You can write a SQL query for multilingual processing. At this time, there must be two columns and no alias should be given to the search column.
+4. You can write a SQL query for multilingual processing. At this time, there ***must be two columns*** and ***no alias*** should be given to the search column.
 5. Press the Test button to check the results and confirm if they are correct, or rewrite if not.
 6. Attach the attachment and press the send button.
 7. The download will proceed automatically after some time.
