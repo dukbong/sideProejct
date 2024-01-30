@@ -4,6 +4,9 @@ Reason for planning : The reason for creating this website is to solve the probl
 
 The project consists of Front : React and Back : Spring boot.
 
+## Issues
+1. There is a mix of Korean and English in the text, so we need to figure out how to handle this.
+
 ### How to use the website
 1. Enter your DB Url, Username, and Password. If there is no password, leave it blank.
 2. In the case of DB drivers ***Oracle, MySQL 8.x, MariaDB, and H***2 can be omitted.
