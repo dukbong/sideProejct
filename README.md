@@ -23,3 +23,6 @@ It should have a directory structure like the example below.
 
 ### How large can the attached file be?
 Currently, up to 100MB is possible, and according to test results, it takes about ***35 seconds for 30MB***.
+
+### Session content
+The session is maintained for ***30 minutes*** after the first transmission, the most recent DB_Info is saved, and Url, UserName, PassWorad, Driver, Extension, and Query are automatically created.
