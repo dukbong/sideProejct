@@ -1,6 +1,8 @@
 **Ko trans Code** is a website that helps with multilingual processing of ***jsp*** files and ***js*** files.
 
-The project consists of React and Spring boot.
+The reason for creating this website is to solve the problem of taking a lot of time to process multiple languages.
+
+The project consists of Front : React and Back : Spring boot.
 
 ### How to use the website
 1. Enter the DB url, username, and password.
