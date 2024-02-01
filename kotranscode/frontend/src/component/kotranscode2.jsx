@@ -101,7 +101,7 @@ function Kotranscode2() {
           // headers: { 'Content-Type': 'multipart/form-data' }
         })
         .then((response) => {
-          console.log(response.data);
+          // console.log(response.data);
           // setZipFileData(response.data.zipfile);
           setDirectory([...response.data.directory]); // 변경 감지
           document.getElementById("directoryarea").style.display = "block";
@@ -178,9 +178,9 @@ function Kotranscode2() {
         }
       }
       let alertStr = "====테스트 결과====\n조회 컬럼은 2개만 가능합니다.\nkey에는 한글 value에는 코드가 와야합니다.\n================\n";
-      alertStr += "key          value\n";
+      alertStr += "key           value\n";
       for(let i = 0; i < testShow.length; i++){
-        alertStr += testShow[i].transKey + "          " + testShow[i].transValue + "\n";
+        alertStr += testShow[i].transKey + "           " + testShow[i].transValue + "\n";
       }
       if(testShow.length >= 4){
         alertStr += "...\n";
@@ -189,7 +189,7 @@ function Kotranscode2() {
     })
     .catch((err) => {
       alert("알수 없는 오류 발생! 쿼리문을 재작성해주세요.");
-      console.log(err);
+      // console.log(err);
     })
   }
 
