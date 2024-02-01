@@ -42,9 +42,11 @@ import api.kotrans.kotranscode.domain.ZipFile;
 import api.kotrans.kotranscode.service.DynamicDatabaseService;
 import api.kotrans.kotranscode.service.KoTransCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class KoTransCodeImpl implements KoTransCode {
 
 	private final DynamicDatabaseService dynamicDatabaseService;
@@ -158,7 +160,8 @@ public class KoTransCodeImpl implements KoTransCode {
 			// tempDirectory.toString());
 			String unzipDirectory = unzip(uploadedFilePath.toString(), testDirectory.toString());
 
-			System.out.println("압축 해제 완료 및 폴더 생성 완료 : " + ((System.currentTimeMillis() - start) / 1000) + "초 소요");
+//			System.out.println("압축 해제 완료 및 폴더 생성 완료 : " + ((System.currentTimeMillis() - start) / 1000) + "초 소요");
+			log.info("압축 해제 완료 및 폴더 생성 완료              :: {} 초 소요", (System.currentTimeMillis() - start) / 1000);
 			start = System.currentTimeMillis();
 			// System.out.println("unzipDirectory : " + unzipDirectory);
 			String[] directoryAddressArr = unzipDirectory.split("[\\\\/]");
@@ -188,7 +191,8 @@ public class KoTransCodeImpl implements KoTransCode {
 																												// Map
 																												// 추가해서
 																												// 넣기.
-			System.out.println("디렉토리 구조 파악 및 파일 수정 까지 완료 : " + ((System.currentTimeMillis() - start) / 1000) + "초 소요");
+//			System.out.println("디렉토리 구조 파악 및 파일 수정 까지 완료 : " + ((System.currentTimeMillis() - start) / 1000) + "초 소요");
+			log.info("디렉토리 구조 파악 및 파일 수정 까지 완료 :: {} 초 소요", (System.currentTimeMillis() - start) / 1000);
 			start = System.currentTimeMillis();
 
 			zip.setDirectory(testResult);
@@ -196,7 +200,8 @@ public class KoTransCodeImpl implements KoTransCode {
 			// String newZipPath = makeZip(tempDirectory.toString(), testDir,
 			// uid);
 			String newZipPath = makeZip(testDirectory.toString(), testDir, uid);
-			System.out.println("압축 파일 생성 완료 : " + ((System.currentTimeMillis() - start) / 1000) + "초 소요");
+//			System.out.println("압축 파일 생성 완료 : " + ((System.currentTimeMillis() - start) / 1000) + "초 소요");
+			log.info("압축 파일 생성 완료                                :: {} 초 소요", (System.currentTimeMillis() - start) / 1000);
 			// byte를 base64로 변환 후 보내기
 			// Path path = Paths.get(newZipPath);
 			// byte[] zipBytes = Files.readAllBytes(path);
