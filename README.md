@@ -1,6 +1,3 @@
-## Issues
-1. There is a mix of Korean and English in the text, so we need to figure out how to handle this.
-
 ## KoTransCode
 **KoTransCode** is a website that helps with multilingual processing of ***jsp*** files and ***js*** files.
 
@@ -14,7 +11,8 @@ However, the current approach allows individuals to use their own database.
 The entire source code is compressed, and the server retrieves language codes from the database to convert Korean text in the source code into code snippets.
 
 ### Check before Use
-The jsp file and js file must be properly separated before use. Currently, characters in jsp tags are coded properly, but in the case of js files, only Korean characters can be coded and processed.
+1. The jsp file and js file must be properly separated before use. Currently, characters in jsp tags are coded properly, but in the case of js files, only Korean characters can be coded and processed.
+2. The query for retrieval can be written without distinction between lowercase and uppercase, and it is not possible to write anything other than column names when composing the query. Additionally, ***aliases should not be included***. Example query: ***SELECT CMMN_CODE_NM, CMMN_CODE FROM TEST_CMMN_CODE***
 
 ### How to use the website
 1. Enter your DB Url, Username, and Password. If there is no password, leave it blank.
