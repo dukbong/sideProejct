@@ -1,6 +1,3 @@
-## Issues
-1. There is a mix of Korean and English in the text, so we need to figure out how to handle this.
-
 ## KoTransCode
 **KoTransCode** is a website that helps with multilingual processing of ***jsp*** files and ***js*** files.
 
