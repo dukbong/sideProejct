@@ -37,8 +37,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequiredArgsConstructor
-@Slf4j
-@RequestMapping("/api")
 public class KotransController {
 	// private final DynamicDataSourceManager dynamicDataSourceManager;
 	private final DynamicDatabaseService dynamicDatabaseService;
@@ -59,7 +57,6 @@ public class KotransController {
 												@RequestParam("password") String password, @RequestParam("url") String url,
 												@RequestParam("prefix") String prefix, @RequestParam("suffix") String suffix,
 												@RequestParam("exprefix") String exprefix, HttpSession session) {
-		log.debug("{}","koTransCode2");
 		String[] exprefixArr = Arrays.stream(exprefix.split(","))
 					                 .map(String::trim)
 					                 .toArray(String[]::new);
