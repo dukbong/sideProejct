@@ -11,7 +11,7 @@ function Kotranscode2() {
   const [directory, setDirectory] = useState([]);
 
   useEffect(() => {
-    axios.get("currentInfo")
+    axios.get("/api/currentInfo")
     .then((res) => {
       if(res.data !== ''){
         document.getElementById("url").value = res.data.url;
@@ -96,7 +96,7 @@ function Kotranscode2() {
 
 
       axios
-        .post("koTransCode2", formData, {
+        .post("/api/koTransCode2", formData, {
           // responseType: "arraybuffer",
           // headers: { 'Content-Type': 'multipart/form-data' }
         })
@@ -148,7 +148,7 @@ function Kotranscode2() {
   };
 
   const queryTest = () => {
-    axios.get('queryTest', {
+    axios.get('/api/queryTest', {
       params : {
         searchQuery : document.getElementById("searchQuery").value,
         driver : document.getElementById("driver").value,
