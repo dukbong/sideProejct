@@ -1,5 +1,6 @@
 package api.kotrans.kotranscode.serviceImpl;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -113,13 +114,7 @@ public class KoTransCodeImpl implements KoTransCode {
 	}
 
 	@Override
-	// public ZipFile CodeExchange2(MultipartFile file, String[]
-	// searchCondition, String searchQuery) {
 	public ZipFile CodeExchange2(MultipartFile file, DbInfo dbInfo) {
-
-		// 여기서 바로 DB 연결하고 Map으로 저장한다.
-		// 아래에선 Map을 get해서 value값으로 대체한다.
-		// ===========================================================
 
 		dbInfo.setSearchQuery(ChangeQueryConfig.changeQuery(dbInfo.getSearchQuery()));
 		List<ResultDao> resultMap = null;
@@ -128,8 +123,6 @@ public class KoTransCodeImpl implements KoTransCode {
 		} catch (Exception e) {
 			throw e;
 		}
-
-		// ===========================================================
 
 		Long start = System.currentTimeMillis();
 		UUID uid = UUID.randomUUID();
@@ -160,7 +153,8 @@ public class KoTransCodeImpl implements KoTransCode {
 			// tempDirectory.toString());
 			String unzipDirectory = unzip(uploadedFilePath.toString(), testDirectory.toString());
 
-//			System.out.println("압축 해제 완료 및 폴더 생성 완료 : " + ((System.currentTimeMillis() - start) / 1000) + "초 소요");
+			// System.out.println("압축 해제 완료 및 폴더 생성 완료 : " +
+			// ((System.currentTimeMillis() - start) / 1000) + "초 소요");
 			log.info("압축 해제 완료 및 폴더 생성 완료              :: {} 초 소요", (System.currentTimeMillis() - start) / 1000);
 			start = System.currentTimeMillis();
 			// System.out.println("unzipDirectory : " + unzipDirectory);
@@ -191,7 +185,8 @@ public class KoTransCodeImpl implements KoTransCode {
 																												// Map
 																												// 추가해서
 																												// 넣기.
-//			System.out.println("디렉토리 구조 파악 및 파일 수정 까지 완료 : " + ((System.currentTimeMillis() - start) / 1000) + "초 소요");
+			// System.out.println("디렉토리 구조 파악 및 파일 수정 까지 완료 : " +
+			// ((System.currentTimeMillis() - start) / 1000) + "초 소요");
 			log.info("디렉토리 구조 파악 및 파일 수정 까지 완료 :: {} 초 소요", (System.currentTimeMillis() - start) / 1000);
 			start = System.currentTimeMillis();
 
@@ -200,8 +195,10 @@ public class KoTransCodeImpl implements KoTransCode {
 			// String newZipPath = makeZip(tempDirectory.toString(), testDir,
 			// uid);
 			String newZipPath = makeZip(testDirectory.toString(), testDir, uid);
-//			System.out.println("압축 파일 생성 완료 : " + ((System.currentTimeMillis() - start) / 1000) + "초 소요");
-			log.info("압축 파일 생성 완료                                :: {} 초 소요", (System.currentTimeMillis() - start) / 1000);
+			// System.out.println("압축 파일 생성 완료 : " +
+			// ((System.currentTimeMillis() - start) / 1000) + "초 소요");
+			log.info("압축 파일 생성 완료                                :: {} 초 소요",
+					(System.currentTimeMillis() - start) / 1000);
 			// byte를 base64로 변환 후 보내기
 			// Path path = Paths.get(newZipPath);
 			// byte[] zipBytes = Files.readAllBytes(path);
@@ -279,34 +276,55 @@ public class KoTransCodeImpl implements KoTransCode {
 		return zipFilePath;
 	}
 
-	public void zipFolder(String sourceFolderPath, String zipFilePath) throws IOException {
-		try (FileOutputStream fos = new FileOutputStream(zipFilePath); ZipOutputStream zos = new ZipOutputStream(fos)) {
-			File sourceFolder = new File(sourceFolderPath);
-			zipFile(sourceFolder, sourceFolder.getName(), zos);
-		}
-	}
+//	public void zipFolder(String sourceFolderPath, String zipFilePath) throws IOException {
+//		try (FileOutputStream fos = new FileOutputStream(zipFilePath); ZipOutputStream zos = new ZipOutputStream(fos)) {
+//			File sourceFolder = new File(sourceFolderPath);
+//			zipFile(sourceFolder, sourceFolder.getName(), zos);
+//		}
+//	}
 
-	private void zipFile(File file, String entryName, ZipOutputStream zos) throws IOException {
-		if (file.isDirectory()) {
-			for (File innerFile : file.listFiles()) {
-				zipFile(innerFile, entryName + "/" + innerFile.getName(), zos);
-			}
-		} else {
-			try (FileInputStream fis = new FileInputStream(file)) {
-				ZipEntry zipEntry = new ZipEntry(entryName);
-				zos.putNextEntry(zipEntry);
+	public static void zipFolder(String sourceFolderPath, String zipFilePath) throws IOException {
+		try (ZipOutputStream zipOutputStream = new ZipOutputStream(
+				new BufferedOutputStream(new FileOutputStream(zipFilePath)))) {
+			Path sourcePath = Paths.get(sourceFolderPath);
 
-				byte[] buffer = new byte[8192];
-				int len;
-				while ((len = fis.read(buffer)) > 0) {
-					zos.write(buffer, 0, len);
+			Files.walk(sourcePath).filter(path -> !Files.isDirectory(path)).forEach(path -> {
+				try {
+					String relativePath = sourcePath.relativize(path).toString().replace(File.separator, "/");
+					ZipEntry zipEntry = new ZipEntry(relativePath);
+					zipOutputStream.putNextEntry(zipEntry);
+
+					Files.copy(path, zipOutputStream);
+
+					zipOutputStream.closeEntry();
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
-
-				zos.closeEntry();
-				fis.close();
-			}
+			});
 		}
 	}
+
+//	private void zipFile(File file, String entryName, ZipOutputStream zos) throws IOException {
+//		if (file.isDirectory()) {
+//			for (File innerFile : file.listFiles()) {
+//				zipFile(innerFile, entryName + "/" + innerFile.getName(), zos);
+//			}
+//		} else {
+//			try (FileInputStream fis = new FileInputStream(file)) {
+//				ZipEntry zipEntry = new ZipEntry(entryName);
+//				zos.putNextEntry(zipEntry);
+//
+//				byte[] buffer = new byte[8192];
+//				int len;
+//				while ((len = fis.read(buffer)) > 0) {
+//					zos.write(buffer, 0, len);
+//				}
+//
+//				zos.closeEntry();
+//				fis.close();
+//			}
+//		}
+//	}
 
 	// 압축 파일 해제
 	private String unzip(String zipFilePath, String destDirectory) {
@@ -382,11 +400,17 @@ public class KoTransCodeImpl implements KoTransCode {
 		String filePath = sb.toString();
 		sb.setLength(0);
 
+		char[] buffer = new char[8192];
 		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-			String line;
-			while ((line = reader.readLine()) != null) {
-				sb.append(line).append("\n");
+			// String line;
+			// while ((line = reader.readLine()) != null) {
+			// sb.append(line).append("\n");
+			// }
+			int charRead;
+			while ((charRead = reader.read(buffer)) != -1) {
+				sb.append(buffer, 0, charRead);
 			}
+			sb.append("\n");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
