@@ -94,7 +94,7 @@ function Kotranscode2() {
       document.getElementById("filechang").disabled = true;
       document.getElementById("loading-spinner").style.display = "inline-block";
 
-
+      setDirectory([]);
 
       axios
         // .post("/api/koTransCode2", formData, { // deploy
@@ -196,12 +196,23 @@ function Kotranscode2() {
     })
   }
 
+  const [excludeFiles, setExcludeFiles] = useState([]);
+
+  const handleAddFile = () => {
+    const newExcludeFiles = [...excludeFiles, `excludeFile${excludeFiles.length + 2}`];
+    setExcludeFiles(newExcludeFiles);
+  };
+
+  const handleCancelFile = (index) => {
+    const newExcludeFiles = excludeFiles.filter((file, i) => i !== index);
+    setExcludeFiles(newExcludeFiles);
+  };
 
   return (
     <div>
     <div style={{display : "flex", height:"100%"}}>
     <div style={{height:"500px", width:"600px", backgroundColor: "#31353f"}}>
-      <div style={{width:"550px", paddingTop:"50px", paddingRight:"50px"}}>
+      <div style={{width:"555px", paddingTop:"40px", paddingRight:"50px", paddingLeft:"15px"}}>
         <table>
           <tr>
             <td style={{width:"40%", color: "white", textAlign:"left", fontWeight:"bold"}}>URL<span class="requ"> *</span></td>
@@ -220,10 +231,10 @@ function Kotranscode2() {
             <td style={{width:"60%"}}><input type="text" id="driver" name="driver" style={{width:"100%",height : "30px", boxSizing: "border-box"}} placeholder="Please read the user manual."/></td>
           </tr>
           <tr>
-            <td style={{width:"40%", color: "white", textAlign:"left", fontWeight:"bold"}}>QUERY<span class="requ"> *</span></td>
+            <td style={{width:"40%", color: "white", textAlign:"left", fontWeight:"bold"}}>QUERY<span className="requ"> *</span></td>
             <td style={{display:"flex"}}>
               <input type="text" id="searchQuery" name="searchQuery" style={{width:"100%",height : "30px", boxSizing: "border-box"}} placeholder="ex) SELECT KO, CODE FROM LANG"/>
-              <button onClick={queryTest} style={{width:"16%", marginLeft:"1%", boxSizing: "border-box"}} class="custom-button">TEST</button>
+              <button onClick={queryTest} style={{width:"16%", marginLeft:"1%", boxSizing: "border-box"}} className="custom-button">TEST</button>
             </td>
           </tr>
           <tr>
@@ -237,11 +248,39 @@ function Kotranscode2() {
             </td>
           </tr>
           <tr>
-            <td style={{width:"40%", color: "white", textAlign:"left", fontWeight:"bold"}}>PREFIX TO EXCLUDE</td>
+            <td style={{width:"40%", color: "white", textAlign:"left", fontWeight:"bold"}}>EXCLUDE PREFIX</td>
             <td style={{width:"60%"}}><input type="text" id="exprefix" name="exprefix" style={{width:"100%",height : "30px", boxSizing: "border-box"}} placeholder="Please write a prefix to exclude when searching."/></td>
           </tr>
           <tr>
-            <td style={{width:"40%", color: "white", textAlign:"left", fontWeight:"bold"}}>EXTENSION<span class="requ"> *</span></td>       
+            <td style={{ width: "40%", color: "white", textAlign: "left", fontWeight: "bold" }}>EXCLUDED FILES</td>
+            <td style={{ display: "flex"}}>
+              <input type="text" id="excludeFile1" name="excludeFile1" style={{width:"100%",height : "30px", boxSizing: "border-box"}} placeholder="File you want to exclude."/>
+              <button onClick={handleAddFile} style={{width:"16%", marginLeft:"1%", boxSizing: "border-box"}} className="add-custom-button">+</button>
+            </td>
+          </tr>
+          {excludeFiles.map((file, index) => (
+                <tr>
+                  <td style={{width:"40%", color: "white", textAlign:"left", fontWeight:"bold"}}></td>    
+                  <td  style={{ display: "flex"}}>
+                    <input
+                      type="text"
+                      id={file}
+                      name={file}
+                      style={{width:"100%",height : "30px", boxSizing: "border-box"}}
+                      placeholder="File you want to exclude."
+                    />
+                    <button
+                      style={{width:"16%", marginLeft:"1%", boxSizing: "border-box"}}
+                      className="cancel-custom-button"
+                      onClick={() => handleCancelFile(index)}
+                    >
+                      -
+                    </button>
+                  </td>
+                </tr>
+              ))}
+          <tr>
+            <td style={{width:"40%", color: "white", textAlign:"left", fontWeight:"bold"}}>EXTENSION<span className="requ"> *</span></td>       
             <td>
               <fieldset id="extensionFiled">
                 <legend style={{color:"white"}}>Choose File Extension:</legend>
@@ -280,18 +319,20 @@ function Kotranscode2() {
 
     </div>
     <div style={{width:"20px"}}></div>
-    <div style={{height:"500px", width:"100%", backgroundColor: "#31353f"}}>
-      <div id="directoryarea" style={{paddingLeft:"10px",textAlign:"left" ,background:"#31353f",color:"white",display:"none", height: "100%", overflowY: "scroll"}}>
-              {directory.map((item, index) => {
-                const updatedItem = item.replace('^update', '').replace('^insert', ''); // ^update와 ^insert 제거
+      <div style={{height:"500px", width:"100%", backgroundColor: "#31353f"}}>
+        <div id="directoryarea" style={{paddingLeft:"10px",textAlign:"left" ,background:"#31353f",color:"white",display:"none", height: "100%", overflowY: "scroll"}}>
+          <ui>
+        {directory.map((item, index) => {
+    const updatedItem = item.replace('_$UPDATE', '').replace('_$INSERT', ''); // ^update와 ^insert 제거
 
-                  return (
-                      <li key={index} style={{ color: item.includes('^update') ? 'red' : (item.includes('^insert') ? 'blue' : 'white') }}>
-                          {updatedItem}
-                      </li>
-                  );
-              })}
-          </div>
+    return (
+        <li key={index} className={item.includes('_$UPDATE') ? 'update' : (item.includes('_$INSERT') ? 'insert' : '')} style={{fontSize:"18px"}}>
+            <span className="circle" style={{fontSize:"20px"}} ></span>{updatedItem}
+        </li>
+    );
+})}
+</ui>
+        </div>
       </div>
     </div>
               <Ads/>

@@ -34,6 +34,50 @@
   background-color: rgb(13, 148, 13);
 }
 
+.add-custom-button {
+  font-size: 14px;
+  background-color: red;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.5s;
+}
+
+.add-custom-button:hover {
+  background-color: red;
+}
+.cancel-custom-button {
+  font-size: 14px;
+  background-color: red;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.5s;
+}
+
+.cancel-custom-button:hover {
+  background-color: red;
+}
+
 .requ{
   color: red;
+}
+
+.circle::before {
+  content: '\25CF'; /* 유니코드에서 동그라미 모양 */
+  margin-right: 5px; /* 동그라미와 텍스트 간의 여백 조절 */
+}
+
+.update .circle::before {
+  color: green; /* update 클래스의 동그라미 색상 (초록색) */
+}
+
+.insert .circle::before {
+  color: red; /* insert 클래스의 동그라미 색상 (빨간색) */
+}
+
+li{
+  list-style: none;
 }

@@ -10,7 +10,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.FileSystems;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -53,7 +52,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class KoTransCodeImpl implements KoTransCode {
+public class KoTransCodeImpl2 implements KoTransCode {
 
 	private final DynamicDatabaseService dynamicDatabaseService;
 
@@ -519,16 +518,21 @@ public class KoTransCodeImpl implements KoTransCode {
 		int result = 3;
 		sb.append(tempDirectory).append("/").append(folderName).append("/").append(targetFile);
 		String filePath = sb.toString();
-		
+
 		Set<String> oldCharNote = new TreeSet<>();
 		sb.setLength(0); // 초기화
 
+		System.out.println(targetFile);
+		if(targetFile.contains("mainHeader")){
+			System.out.println(fileContent);
+		}
 		// try (BufferedWriter bw = new BufferedWriter(new
 		// FileWriter(filePath))) {
 		try (FileWriter fileWriter = new FileWriter(filePath); BufferedWriter bw = new BufferedWriter(fileWriter)) {
 			// fileContent를 가지고 여기서 한번에 파일들을 다국어 처리 해줄꺼다.
 			String[] arr = fileContent.split("\n");
 			if (targetFile.endsWith(".jsp") || targetFile.endsWith(".html")) {
+				result = 3;
 				// jsp 파일일 경우
 				for (int i = 0; i < arr.length; i++) {
 
@@ -572,7 +576,7 @@ public class KoTransCodeImpl implements KoTransCode {
 						prefixTest = oldChar.startsWith(preSuffix[0]);
 
 						if (!prefixTest) {
-//							boolean boo = false;
+							boolean boo = false;
 							Map<String, String> map = new HashMap<>();
 							for (ResultDao rd : resultMap) {
 								map.put(rd.getTransKey(), rd.getTransValue());
@@ -581,24 +585,19 @@ public class KoTransCodeImpl implements KoTransCode {
 							// if (rd.getTransKey().equals(oldChar)) {
 							if (map.get(oldChar) != null) {
 								row = row.replace(oldChar, preSuffix[0] + map.get(oldChar) + preSuffix[1]);
-//								if(targetFile.contains("mainHeader")){
-//									System.out.println(row);
-//									System.out.println("target result = " + result);
-//								}
 								if (result != 2) {
 									result = 1;
 								}
-//								boo = true;
+								boo = true;
 //								break;
 							} else {
 								oldCharNote.add(oldChar);
-								result = 2;
 							}
 							// }
-//							if (!boo) {
-//								result = 2;
-//							}
-							if (map.get(oldChar) != null) {
+							if (!boo) {
+								result = 2;
+							}
+							if (result != 2) {
 								row += " <!-- " + resultBuilder.toString() + " -->\n";
 								if (targetFile.endsWith(".jsp")) {
 									row += " <%-- " + arr[i] + " --%>\n";
@@ -618,6 +617,7 @@ public class KoTransCodeImpl implements KoTransCode {
 			} else if (targetFile.endsWith(".js") || targetFile.endsWith(".java")) {
 				// js 파일일 경우
 				for (int i = 0; i < arr.length; i++) {
+					result = 3;
 
 					String row = arr[i];
 					// 주석 제거
@@ -636,34 +636,29 @@ public class KoTransCodeImpl implements KoTransCode {
 					// 한글이 존재한다면 해당 조건에 걸린 후 변경된다.
 					if (!resultBuilder.toString().equals("")) {
 						String oldChar = resultBuilder.toString().trim();
-//						boolean boo = false;
-						Map<String, String> map = new HashMap<>();
+						boolean boo = false;
 						for (ResultDao rd : resultMap) {
-							map.put(rd.getTransKey(), rd.getTransValue());
-						}
-//						for (ResultDao rd : resultMap) {
-//							if (rd.getTransKey().equals(oldChar)) {
-							if (map.get(oldChar) != null){
-								row = row.replace(oldChar, preSuffix[0] + map.get(oldChar) + preSuffix[1]);
+							if (rd.getTransKey().equals(oldChar)) {
+								row = row.replace(oldChar, preSuffix[0] + rd.getTransValue() + preSuffix[1]);
 								if (result != 2) {
 									result = 1;
 								}
-//								boo = true;
-//								break;
+								boo = true;
+								break;
 							} else {
 								oldCharNote.add(oldChar);
-								result = 2;
 							}
-//						}
-//						if (!boo) {
-//							result = 2;
-//						}
-						if(map.get(oldChar) != null){
-							row += " // " + resultBuilder.toString() + "\n";
-							row += " // " + arr[i];
-							sb.append(row).append("\n");
-							continue;
 						}
+						if (!boo) {
+							result = 2;
+						}
+
+						row += " // " + resultBuilder.toString() + "\n";
+						row += " // " + arr[i];
+
+						sb.append(row).append("\n");
+
+						continue;
 					}
 					sb.append(arr[i]).append("\n");
 				}
@@ -675,22 +670,17 @@ public class KoTransCodeImpl implements KoTransCode {
 			e.printStackTrace();
 		}
 
-//		String middleStr = System.getProperty("os.name").contains("Window") ? "\\" : "/";
-		String fileSeparator = FileSystems.getDefault().getSeparator();
-		if(!oldCharNote.isEmpty()){
-			try (BufferedWriter bw = new BufferedWriter(
-					new FileWriter(tempDirectory + fileSeparator + folderName + fileSeparator + "Words_to_add.txt", true));) {
-				
-					StringBuilder wordSb = new StringBuilder();
-					wordSb.append("- src" + fileSeparator + targetFile + "\n");
-					for (String oChar : oldCharNote) {
-						wordSb.append(oChar + "\n");
-					}
-					wordSb.append("=====================================\n");
-					bw.write(wordSb.toString());
-			} catch (IOException e) {
-				e.printStackTrace();
+		String middleStr = System.getProperty("os.name").contains("Window") ? "\\" : "/";
+		try (BufferedWriter bw = new BufferedWriter(
+				new FileWriter(tempDirectory + middleStr + folderName + middleStr + "Words_to_add.txt"));) {
+
+			for (String oChar : oldCharNote) {
+				String row = oChar + "\n";
+				bw.write(row);
 			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return result;
 	}
