@@ -3,14 +3,13 @@ package api.kotrans.kotranscode.serviceImpl;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -20,6 +19,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -207,21 +207,37 @@ public class KoTransCodeImpl implements KoTransCode {
 			// 쪼갠 다음 저장하기
 			Path path = Paths.get(newZipPath);
 
+//			try (InputStream inputStream = Files.newInputStream(path)) {
+//				byte[] buffer = new byte[8192]; // 8 KB buffer size, you can
+//												// adjust this based on your
+//												// needs
+//				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+//
+//				int bytesRead;
+//				while ((bytesRead = inputStream.read(buffer)) != -1) {
+//					outputStream.write(buffer, 0, bytesRead);
+//				}
+//
+//				byte[] zipBytes = outputStream.toByteArray();
+//				zip.setZipfile(Base64.getEncoder().encodeToString(zipBytes));
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
 			try (InputStream inputStream = Files.newInputStream(path)) {
-				byte[] buffer = new byte[8192]; // 8 KB buffer size, you can
-												// adjust this based on your
-												// needs
-				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			    Base64.Encoder encoder = Base64.getEncoder();
+			    byte[] buffer = new byte[8192]; // 8 KB buffer size, you can adjust this based on your needs
 
-				int bytesRead;
-				while ((bytesRead = inputStream.read(buffer)) != -1) {
-					outputStream.write(buffer, 0, bytesRead);
-				}
+			    StringBuilder base64StringBuilder = new StringBuilder();
+			    int bytesRead;
+			    while ((bytesRead = inputStream.read(buffer)) != -1) {
+			        byte[] encodedBytes = encoder.encode(Arrays.copyOf(buffer, bytesRead));
+			        base64StringBuilder.append(new String(encodedBytes, StandardCharsets.UTF_8));
+			    }
 
-				byte[] zipBytes = outputStream.toByteArray();
-				zip.setZipfile(Base64.getEncoder().encodeToString(zipBytes));
+			    String base64Zip = base64StringBuilder.toString();
+			    zip.setZipfile(base64Zip);
 			} catch (IOException e) {
-				e.printStackTrace();
+			    e.printStackTrace();
 			}
 
 			// InputStream으로 보내기
@@ -276,55 +292,82 @@ public class KoTransCodeImpl implements KoTransCode {
 		return zipFilePath;
 	}
 
-//	public void zipFolder(String sourceFolderPath, String zipFilePath) throws IOException {
-//		try (FileOutputStream fos = new FileOutputStream(zipFilePath); ZipOutputStream zos = new ZipOutputStream(fos)) {
-//			File sourceFolder = new File(sourceFolderPath);
-//			zipFile(sourceFolder, sourceFolder.getName(), zos);
-//		}
-//	}
+	// public void zipFolder(String sourceFolderPath, String zipFilePath) throws
+	// IOException {
+	// try (FileOutputStream fos = new FileOutputStream(zipFilePath);
+	// ZipOutputStream zos = new ZipOutputStream(fos)) {
+	// File sourceFolder = new File(sourceFolderPath);
+	// zipFile(sourceFolder, sourceFolder.getName(), zos);
+	// }
+	// }
 
-	public static void zipFolder(String sourceFolderPath, String zipFilePath) throws IOException {
+	// public void zipFolder(String sourceFolderPath, String zipFilePath) throws
+	// IOException {
+	// try (ZipOutputStream zipOutputStream = new ZipOutputStream(
+	// new BufferedOutputStream(new FileOutputStream(zipFilePath)))) {
+	// Path sourcePath = Paths.get(sourceFolderPath);
+	//
+	// Files.walk(sourcePath).filter(path ->
+	// !Files.isDirectory(path)).forEach(path -> {
+	// try {
+	// String relativePath =
+	// sourcePath.relativize(path).toString().replace(File.separator, "/");
+	// ZipEntry zipEntry = new ZipEntry(relativePath);
+	// zipOutputStream.putNextEntry(zipEntry);
+	//
+	// Files.copy(path, zipOutputStream);
+	//
+	// zipOutputStream.closeEntry();
+	// } catch (IOException e) {
+	// e.printStackTrace();
+	// }
+	// });
+	// }
+	// }
+	public void zipFolder(String sourceFolderPath, String zipFilePath) throws IOException {
 		try (ZipOutputStream zipOutputStream = new ZipOutputStream(
-				new BufferedOutputStream(new FileOutputStream(zipFilePath)))) {
+				new BufferedOutputStream(new FileOutputStream(zipFilePath), 8192))) {
+			// zipOutputStream.setLevel(Deflater.BEST_SPEED);
 			Path sourcePath = Paths.get(sourceFolderPath);
 
-			Files.walk(sourcePath).filter(path -> !Files.isDirectory(path)).forEach(path -> {
-				try {
-					String relativePath = sourcePath.relativize(path).toString().replace(File.separator, "/");
-					ZipEntry zipEntry = new ZipEntry(relativePath);
-					zipOutputStream.putNextEntry(zipEntry);
-
-					Files.copy(path, zipOutputStream);
-
-					zipOutputStream.closeEntry();
-				} catch (IOException e) {
-					e.printStackTrace();
+			Files.walkFileTree(sourcePath, new SimpleFileVisitor<Path>() {
+				@Override
+				public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
+					if (!attrs.isDirectory()) {
+						String relativePath = sourcePath.relativize(path).toString().replace(File.separator, "/");
+						ZipEntry zipEntry = new ZipEntry(relativePath);
+						zipOutputStream.putNextEntry(zipEntry);
+						Files.copy(path, zipOutputStream);
+						zipOutputStream.closeEntry();
+					}
+					return FileVisitResult.CONTINUE;
 				}
 			});
 		}
 	}
 
-//	private void zipFile(File file, String entryName, ZipOutputStream zos) throws IOException {
-//		if (file.isDirectory()) {
-//			for (File innerFile : file.listFiles()) {
-//				zipFile(innerFile, entryName + "/" + innerFile.getName(), zos);
-//			}
-//		} else {
-//			try (FileInputStream fis = new FileInputStream(file)) {
-//				ZipEntry zipEntry = new ZipEntry(entryName);
-//				zos.putNextEntry(zipEntry);
-//
-//				byte[] buffer = new byte[8192];
-//				int len;
-//				while ((len = fis.read(buffer)) > 0) {
-//					zos.write(buffer, 0, len);
-//				}
-//
-//				zos.closeEntry();
-//				fis.close();
-//			}
-//		}
-//	}
+	// private void zipFile(File file, String entryName, ZipOutputStream zos)
+	// throws IOException {
+	// if (file.isDirectory()) {
+	// for (File innerFile : file.listFiles()) {
+	// zipFile(innerFile, entryName + "/" + innerFile.getName(), zos);
+	// }
+	// } else {
+	// try (FileInputStream fis = new FileInputStream(file)) {
+	// ZipEntry zipEntry = new ZipEntry(entryName);
+	// zos.putNextEntry(zipEntry);
+	//
+	// byte[] buffer = new byte[8192];
+	// int len;
+	// while ((len = fis.read(buffer)) > 0) {
+	// zos.write(buffer, 0, len);
+	// }
+	//
+	// zos.closeEntry();
+	// fis.close();
+	// }
+	// }
+	// }
 
 	// 압축 파일 해제
 	private String unzip(String zipFilePath, String destDirectory) {
@@ -347,6 +390,62 @@ public class KoTransCodeImpl implements KoTransCode {
 		}
 		return unzipDirectory;
 	}
+	// public void unzip(String zipFilePath, String destinationFolderPath)
+	// throws IOException {
+	// try (ZipInputStream zipInputStream = new ZipInputStream(new
+	// BufferedInputStream(new FileInputStream(zipFilePath)))) {
+	// Path destinationPath = Paths.get(destinationFolderPath);
+	//
+	// ZipEntry zipEntry;
+	// while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+	// Path filePath = destinationPath.resolve(zipEntry.getName());
+	// Files.createDirectories(filePath.getParent());
+	//
+	// try (BufferedOutputStream bufferedOutputStream = new
+	// BufferedOutputStream(new FileOutputStream(filePath.toFile()))) {
+	// byte[] buffer = new byte[8192];
+	// int bytesRead;
+	// while ((bytesRead = zipInputStream.read(buffer)) != -1) {
+	// bufferedOutputStream.write(buffer, 0, bytesRead);
+	// }
+	// }
+	//
+	// zipInputStream.closeEntry();
+	// }
+	// }
+	// }
+
+	// public String unzip(String zipFilePath, String destinationFolderPath)
+	// throws IOException {
+	// String unzipDirectory = null;
+	// try (ZipInputStream zipInputStream = new ZipInputStream(new
+	// BufferedInputStream(new FileInputStream(zipFilePath)))) {
+	// Path destinationPath = Paths.get(destinationFolderPath);
+	//
+	// ZipEntry zipEntry;
+	// while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+	// Path filePath = destinationPath.resolve(zipEntry.getName());
+	// Files.createDirectories(filePath.getParent());
+	//
+	// try (BufferedOutputStream bufferedOutputStream = new
+	// BufferedOutputStream(new FileOutputStream(filePath.toFile()))) {
+	// byte[] buffer = new byte[8192];
+	// int bytesRead;
+	// while ((bytesRead = zipInputStream.read(buffer)) != -1) {
+	// bufferedOutputStream.write(buffer, 0, bytesRead);
+	// }
+	// }
+	//
+	// zipInputStream.closeEntry();
+	// }
+	//
+	// unzipDirectory = destinationPath.toString();
+	// } catch (IOException e) {
+	// e.printStackTrace();
+	// }
+	//
+	// return unzipDirectory;
+	// }
 
 	// 압축 푼것의 구조를 파악한다.
 	private ArrayList<String> printDirectory(String directoryPath, String tempDirectory, String folderName,
@@ -375,7 +474,6 @@ public class KoTransCodeImpl implements KoTransCode {
 							i += "^insert";
 							break;
 						}
-
 						break;
 					}
 				}
